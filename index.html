@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Mind Trails – Coaching Cards</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
+<meta charset="utf-8"/>
+<title>Mind Trails – Coaching Cards</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<style>
     body {
       font-family: sans-serif;
       background: #f0f0f0;
@@ -79,7 +80,6 @@
       cursor: pointer;
     }
   </style>
-
 <style>
   html, body {
     margin: 0;
@@ -147,32 +147,53 @@
     }
   }
 </style>
-
 </head>
 <body>
+<div id="instructions" style="position: fixed; inset: 0; background: #ffffff; color: #000; padding: 24px; overflow-y: auto; z-index: 9999; display: flex; flex-direction: column; justify-content: space-between;">
+<div>
+<h2>Welcome to Mind Trails 🌿</h2>
+<p>This is a card-based reflection game played in <strong>pairs</strong>. One person is the <em>Seeker</em>, and the other is the <em>Guide</em>.</p>
+<p>The Seeker chooses a challenge or goal. Together, you will walk through <strong>6 card stages</strong> — each helping the Seeker explore, reframe, and move forward.</p>
+<h3>🌀 How It Works:</h3>
+<ol>
+<li><strong>Start with "Goal" cards</strong> to define a challenge.</li>
+<li>Click <strong>“Draw”</strong> to get one reflection question.</li>
+<li>Read it aloud and reflect together.</li>
+<li>After a few cards (or when ready), click <strong>"Next Phase"</strong> to move to the next step.</li>
+<li>You’ll continue through <strong>Support → Exploration → Challenge → Creativity → Action</strong>.</li>
+</ol>
+<h3>🎭 Example:</h3>
+<p>Anna and Lukas are playing. Lukas is the Seeker.</p>
+<blockquote>
+      Anna: “What would you like to achieve in the next month?”<br/>
+      Lukas: “I want to feel clear about my next career step.”<br/>
+      Anna: “Let’s explore that further...”<br/>
+</blockquote>
+<p>Together, they reflect using one card per step, gaining insight along the way.</p>
+</div>
+<div style="text-align: center; margin-top: 20px;">
+<button onclick="document.getElementById('instructions').style.display='none'" style="padding: 14px 28px; font-size: 18px; border: none; background: #2C5F2D; color: white; border-radius: 8px;">Start the Journey</button>
+</div>
+</div>
 
-  <h1>Mind Trails</h1>
-  <p>Select a category:</p>
-
-  <div id="categories">
-    <button class="category-btn Goal" onclick="selectCategory('Goal', this)">Goal ⚪</button>
-    <button class="category-btn Support" onclick="selectCategory('Support', this)">Support 🟢</button>
-    <button class="category-btn Exploration" onclick="selectCategory('Exploration', this)">Exploration 🔵</button>
-    <button class="category-btn Challenge" onclick="selectCategory('Challenge', this)">Challenge 🔴</button>
-    <button class="category-btn Creativity" onclick="selectCategory('Creativity', this)">Creativity 🟡</button>
-    <button class="category-btn Action" onclick="selectCategory('Action', this)">Action 🟠</button>
-  </div>
-
-  <div id="cardBox"></div>
-  <div id="followUpBox"></div>
-
-  <div id="controls">
-    <button class="control-btn" onclick="drawCard()">🎴 Draw</button>
-    <button class="control-btn" onclick="prevCard()">⬅️ Back</button>
-    <button class="control-btn" id="showFollowUp" style="display: none;" onclick="showFollowUp()">Help, I'm stuck</button>
-  </div>
-
-  <script>
+<h1>Mind Trails</h1>
+<p>Select a category:</p>
+<div id="categories">
+<button class="category-btn Goal" onclick="selectCategory('Goal', this)">Goal ⚪</button>
+<button class="category-btn Support" onclick="selectCategory('Support', this)">Support 🟢</button>
+<button class="category-btn Exploration" onclick="selectCategory('Exploration', this)">Exploration 🔵</button>
+<button class="category-btn Challenge" onclick="selectCategory('Challenge', this)">Challenge 🔴</button>
+<button class="category-btn Creativity" onclick="selectCategory('Creativity', this)">Creativity 🟡</button>
+<button class="category-btn Action" onclick="selectCategory('Action', this)">Action 🟠</button>
+</div>
+<div id="cardBox"></div>
+<div id="followUpBox"></div>
+<div id="controls">
+<button class="control-btn" onclick="drawCard()">🎴 Draw</button>
+<button class="control-btn" onclick="prevCard()">⬅️ Back</button>
+<button class="control-btn" id="showFollowUp" onclick="showFollowUp()" style="display: none;">Help, I'm stuck</button>
+</div>
+<script>
     const questions = {
       Goal: [
         "What's one area of your life you'd like to improve?",
