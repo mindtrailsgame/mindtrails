@@ -1,13 +1,14 @@
 
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Mind Trails – Coaching Cards</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <style>
+<meta charset="utf-8"/>
+<title>Mind Trails – Coaching Cards</title>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=no" name="viewport"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<style>
     body {
       font-family: sans-serif;
       background: #f0f0f0;
@@ -74,40 +75,103 @@
   </style>
 </head>
 <body>
-  <h1>Mind Trails</h1>
-  <div id="categories">
-    <button class="category-btn" onclick="selectCategory('Goal', this)">Goal</button>
-    <button class="category-btn" onclick="selectCategory('Support', this)">Support</button>
-    <button class="category-btn" onclick="selectCategory('Exploration', this)">Exploration</button>
-    <button class="category-btn" onclick="selectCategory('Challenge', this)">Challenge</button>
-    <button class="category-btn" onclick="selectCategory('Creativity', this)">Creativity</button>
-    <button class="category-btn" onclick="selectCategory('Action', this)">Action</button>
-  </div>
+<h1>Mind Trails</h1>
+<div id="categories">
+<button class="category-btn" onclick="selectCategory('Goal', this)">Goal</button>
+<button class="category-btn" onclick="selectCategory('Support', this)">Support</button>
+<button class="category-btn" onclick="selectCategory('Exploration', this)">Exploration</button>
+<button class="category-btn" onclick="selectCategory('Challenge', this)">Challenge</button>
+<button class="category-btn" onclick="selectCategory('Creativity', this)">Creativity</button>
+<button class="category-btn" onclick="selectCategory('Action', this)">Action</button>
+</div>
+<div id="cardBox"></div>
+<div id="controls">
+<button class="control-btn" onclick="drawCard()">🎴 Draw</button>
+<button class="control-btn" onclick="prevCard()">⬅️ Back</button>
+</div>
+<div id="feedback" style="margin-top: 30px;">
+<p><strong>Give quick feedback:</strong></p>
+<button onclick="sendFeedback('Clear')">Clear</button>
+<button onclick="sendFeedback('Needs Rewording')">Needs Rewording</button>
+<button onclick="sendFeedback('Thought-Provoking')">Thought-Provoking</button>
+<button onclick="sendFeedback('Too Abstract')">Too Abstract</button>
+<button onclick="sendFeedback('Would Skip')">Would Skip</button>
+</div>
 
-  <div id="cardBox"></div>
-
-  <div id="controls">
-    <button class="control-btn" onclick="drawCard()">🎴 Draw</button>
-    <button class="control-btn" onclick="prevCard()">⬅️ Back</button>
-  </div>
-
-  <div id="feedback" style="margin-top: 30px;">
-    <p><strong>Give quick feedback:</strong></p>
-    <button onclick="sendFeedback('Clear')">Clear</button>
-    <button onclick="sendFeedback('Needs Rewording')">Needs Rewording</button>
-    <button onclick="sendFeedback('Thought-Provoking')">Thought-Provoking</button>
-    <button onclick="sendFeedback('Too Abstract')">Too Abstract</button>
-    <button onclick="sendFeedback('Would Skip')">Would Skip</button>
-  </div>
-
-  <script>
+<script>
     const formBase = "https://docs.google.com/forms/d/e/1FAIpQLSe_RADk1KIJbIBIJClrL3Mv8ZzzxTAWjx_-6GqVA9jmHP6BzA/formResponse";
     const entryCategory = "entry.250526545";
     const entryQuestion = "entry.946746809";
     const entryFeedback = "entry.1474705841";
 
     const questions = {
-      Goal: ["What's one area of your life you'd like to improve?"],
+  "Goal": [
+    "What\u2019s one area of your life you\u2019d like to improve?",
+    "What\u2019s a challenge you\u2019re facing right now?",
+    "What skill would you most like to develop?",
+    "What would you like to achieve in the next month?",
+    "If you could change one thing about your current situation, what would it be?",
+    "What is one brave first step you can imagine taking?",
+    "What small achievement would feel like a big victory for you right now?",
+    "Imagine your future self sending you a postcard. What accomplishment would they be celebrating?",
+    "What new skill or habit would make the biggest difference for you?"
+  ],
+  "Support": [
+    "What\u2019s something you\u2019ve overcome that you didn\u2019t think you could?",
+    "When and how have you turned a difficult situation into something positive?",
+    "When do you feel most confident?",
+    "How does the way you support others reveal your own inner resources?",
+    "What\u2019s a recent accomplishment you\u2019re proud of?",
+    "What reminds you that you\u2019re capable, even on hard days?",
+    "What personal strength has helped you in the past?",
+    "What gives you energy when you feel tired or discouraged?",
+    "Who are your \u201croots\u201d \u2013 people or beliefs that keep you going?"
+  ],
+  "Exploration": [
+    "What motivates you to make a change?",
+    "What would success look like for you in the next few months?",
+    "What have you tried so far to reach your goals?",
+    "What is the biggest obstacle standing between you and your ideal outcomes?",
+    "How do you usually respond when faced with rejection?",
+    "What part do you usually play when working in a group?",
+    "When do you feel most confident in your abilities?",
+    "How does your current situation affect your daily life?",
+    "What\u2019s something you haven\u2019t tried yet but are curious about?"
+  ],
+  "Challenge": [
+    "How could you flip this challenge into an exciting opportunity, like turning a problem into a chance to shine?",
+    "If your future self could send you a message about this challenge, what bold, creative idea would they suggest trying?",
+    "What would someone you admire\u2014real or fictional\u2014do to tackle this situation in a totally unexpected way?",
+    "What would you try if you knew you couldn\u2019t fail, and how would it feel to make it happen?",
+    "If you could wave a magic wand to transform this challenge, what would the solution look like, and how would it change things for you?",
+    "If you could solve this problem in any way, no limits, what crazy or cool solution would you dream up?",
+    "What\u2019s a wild, out-of-the-box idea you haven\u2019t considered yet that could shake things up?",
+    "Imagine you\u2019re a superhero facing this challenge. What unique power would you use, and how would you save the day?",
+    "If this situation were a story you\u2019re writing, what surprising twist would you add to make it inspiring and fun?"
+  ],
+  "Creativity": [
+    "How will you celebrate or reward yourself when you complete this action, big or small?",
+    "What new habit or routine could you start to support your goal, even if it\u2019s super simple?",
+    "What obstacle might pop up, and what\u2019s one way you could handle it to stay on track?",
+    "What skill or action will you practice this week to build confidence in your plan?",
+    "What\u2019s one specific step you can take this week to move closer to your goal?",
+    "What\u2019s one resource\u2014like a person, book, or website\u2014you could explore to help you move forward?",
+    "Who could you reach out to for support or encouragement to help you take this step?",
+    "How will you remind yourself to follow through on your next step, like a note or a phone alert?",
+    "What\u2019s one small thing you can do tomorrow that feels exciting or doable for you?"
+  ],
+  "Action": [
+    "What makes you doubt you are good enough for certain roles?",
+    "What responsibility do you need to take for your current situation?",
+    "What makes rejection feel so tough?",
+    "Whose external factors are influencing your choices?",
+    "Who supports you \u2014 and who should be supporting you?",
+    "What is unclear for you about the things you want?",
+    "What negative self-talk do you need to challenge?",
+    "When have you felt like your efforts wouldn\u2019t pay off?",
+    "What\u2019s holding you back from taking the next step?"
+  ]
+};
       Support: ["What gives you energy when discouraged?"],
       Exploration: ["What motivates you to make a change?"],
       Challenge: ["What's holding you back from taking the next step?"],
@@ -178,6 +242,21 @@
       fetch(url, { mode: 'no-cors', method: 'POST' });
       alert("Feedback sent: " + label);
     }
-  </script>
-</body>
+  
+    const categoryColors = {
+      Goal: "#ffffff",
+      Support: "#2C5F2D",
+      Exploration: "#0d47a1",
+      Challenge: "#C0392B",
+      Creativity: "#F1C40F",
+      Action: "#E67E22"
+    };
+    document.querySelectorAll(".category-btn").forEach(btn => {
+      const cat = btn.textContent.trim();
+      if (categoryColors[cat]) {
+        btn.style.backgroundColor = categoryColors[cat];
+      }
+    });
+
+</script></body>
 </html>
