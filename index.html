@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mind Trails – Coaching Cards</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f0f0;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: clamp(28px, 7vw, 40px);
+      margin: 20px 0 10px 0;
+    }
+
+    .category-btn {
+      margin: 6px;
+      padding: 16px 24px;
+      font-size: clamp(18px, 5vw, 24px);
+      border: none;
+      border-radius: 10px;
+      color: black;
+    }
+
+    .active {
+      animation: glow 1.5s infinite alternate;
+      box-shadow: 0 0 6px 2px #66ffff, 0 0 12px 4px #33ccff;
+    }
+
+    #cardBox {
+      margin: 30px auto;
+      padding: 24px;
+      font-size: clamp(20px, 6vw, 26px);
+      max-width: 90%;
+      border-radius: 10px;
+      display: none;
+    }
+
+    button.control-btn {
+      padding: 14px 28px;
+      margin: 10px;
+      font-size: clamp(18px, 5vw, 24px);
+      border: none;
+      border-radius: 8px;
+      background: #555;
+      color: white;
+    }
+
+    #feedback button {
+      margin: 5px;
+      padding: 10px 16px;
+      font-size: clamp(16px, 5vw, 20px);
+      border: none;
+      border-radius: 6px;
+      background-color: #e0e0e0;
+      cursor: pointer;
+    }
+
+    @keyframes glow {
+      from {
+        box-shadow: 0 0 3px 1px #66ffff, 0 0 6px 2px #33ccff;
+      }
+      to {
+        box-shadow: 0 0 6px 3px #66ffff, 0 0 12px 5px #33ccff;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Mind Trails</h1>
+  <div id="categories">
+    <button class="category-btn" onclick="selectCategory('Goal', this)">Goal</button>
+    <button class="category-btn" onclick="selectCategory('Support', this)">Support</button>
+    <button class="category-btn" onclick="selectCategory('Exploration', this)">Exploration</button>
+    <button class="category-btn" onclick="selectCategory('Challenge', this)">Challenge</button>
+    <button class="category-btn" onclick="selectCategory('Creativity', this)">Creativity</button>
+    <button class="category-btn" onclick="selectCategory('Action', this)">Action</button>
+  </div>
+
+  <div id="cardBox"></div>
+
+  <div id="controls">
+    <button class="control-btn" onclick="drawCard()">🎴 Draw</button>
+    <button class="control-btn" onclick="prevCard()">⬅️ Back</button>
+  </div>
+
+  <div id="feedback" style="margin-top: 30px;">
+    <p><strong>Give quick feedback:</strong></p>
+    <button onclick="sendFeedback('Clear')">Clear</button>
+    <button onclick="sendFeedback('Needs Rewording')">Needs Rewording</button>
+    <button onclick="sendFeedback('Thought-Provoking')">Thought-Provoking</button>
+    <button onclick="sendFeedback('Too Abstract')">Too Abstract</button>
+    <button onclick="sendFeedback('Would Skip')">Would Skip</button>
+  </div>
+
+  <script>
+    const formBase = "https://docs.google.com/forms/d/e/1FAIpQLSe_RADk1KIJbIBIJClrL3Mv8ZzzxTAWjx_-6GqVA9jmHP6BzA/formResponse";
+    const entryCategory = "entry.250526545";
+    const entryQuestion = "entry.946746809";
+    const entryFeedback = "entry.1474705841";
+
+    const questions = {
+      Goal: ["What's one area of your life you'd like to improve?"],
+      Support: ["What gives you energy when discouraged?"],
+      Exploration: ["What motivates you to make a change?"],
+      Challenge: ["What's holding you back from taking the next step?"],
+      Creativity: ["If you could wave a magic wand to transform this challenge, what would the solution look like?"],
+      Action: ["What’s one specific step you can take this week to move closer to your goal?"]
+    };
+
+    const bgColors = {
+      Goal: "#ffffff",
+      Support: "#2C5F2D",
+      Exploration: "#0d47a1",
+      Challenge: "#C0392B",
+      Creativity: "#F1C40F",
+      Action: "#E67E22"
+    };
+
+    const textColors = {
+      Goal: "#000000",
+      Creativity: "#000000",
+      Default: "#ffffff"
+    };
+
+    let currentCategory = "";
+    let questionHistory = [];
+    let currentIndex = -1;
+    let remaining = [];
+
+    function selectCategory(category, button) {
+      currentCategory = category;
+      questionHistory = [];
+      currentIndex = -1;
+      remaining = [...questions[category]];
+      document.getElementById("cardBox").style.display = "none";
+      document.querySelectorAll(".category-btn").forEach(btn => btn.classList.remove("active"));
+      button.classList.add("active");
+    }
+
+    function drawCard() {
+      if (!currentCategory || remaining.length === 0) return;
+      const randomIndex = Math.floor(Math.random() * remaining.length);
+      const nextQuestion = remaining.splice(randomIndex, 1)[0];
+      questionHistory.push(nextQuestion);
+      currentIndex = questionHistory.length - 1;
+      displayCard(nextQuestion);
+    }
+
+    function prevCard() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        displayCard(questionHistory[currentIndex]);
+      }
+    }
+
+    function displayCard(text) {
+      const box = document.getElementById("cardBox");
+      box.textContent = text;
+      box.style.display = "block";
+      box.style.background = bgColors[currentCategory];
+      box.style.color = textColors[currentCategory] || textColors.Default;
+    }
+
+    function sendFeedback(label) {
+      const category = currentCategory;
+      const question = questionHistory[currentIndex];
+      const url = `${formBase}?${entryCategory}=` + encodeURIComponent(category) +
+                  `&${entryQuestion}=` + encodeURIComponent(question) +
+                  `&${entryFeedback}=` + encodeURIComponent(label);
+      fetch(url, { mode: 'no-cors', method: 'POST' });
+      alert("Feedback sent: " + label);
+    }
+  </script>
+</body>
+</html>
