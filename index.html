@@ -102,7 +102,6 @@
 <button onclick="sendFeedback('Want to Rephrase')" style="padding: 6px 12px;">💬 Want to Rephrase</button>
 <button onclick="sendFeedback('Useful but Hard to Answer')" style="padding: 6px 12px;">📌 Useful but Hard to Answer</button>
 </div>
-
 <div class="control-buttons">
 <button onclick="drawCard()">Draw</button>
 <button onclick="goBack()">Back</button>
@@ -414,6 +413,28 @@ function sendFeedback(tag) {
   params.append("entry.1474705841", tag);
   window.open(`${baseUrl}?usp=pp_url&${params.toString()}`, "_blank");
 }
-</script>
+
+
+function sendFeedback(tag) {
+  const category = currentCategory;
+  const question = document.getElementById("question-card").innerText;
+  fetch("https://script.google.com/macros/s/AKfycbxRo5EMPqecX7eYX1YGWu1BI5In6jE4KJhg6JNk5XINBeTS79aJtPkqzfumlNXpQQwR/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      category: category,
+      question: question,
+      tag: tag
+    })
+  }).then(() => {
+    alert("✅ Feedback submitted. Thank you!");
+  }).catch(err => {
+    alert("⚠️ Failed to submit feedback.");
+    console.error(err);
+  });
+}</script>
 </body>
 </html>
