@@ -95,6 +95,14 @@
 <button class="category-btn" id="Action" style="background-color:#E67E22;">Action</button>
 </div>
 <div id="question-card">Click “Draw” to begin.</div>
+<div id="feedback-panel" style="margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+<button onclick="sendFeedback('Clear')" style="padding: 6px 12px;">🙋‍♂️ Clear</button>
+<button onclick="sendFeedback('Thought-Provoking')" style="padding: 6px 12px;">🤯 Thought-Provoking</button>
+<button onclick="sendFeedback('Confusing')" style="padding: 6px 12px;">😕 Confusing</button>
+<button onclick="sendFeedback('Want to Rephrase')" style="padding: 6px 12px;">💬 Want to Rephrase</button>
+<button onclick="sendFeedback('Useful but Hard to Answer')" style="padding: 6px 12px;">📌 Useful but Hard to Answer</button>
+</div>
+
 <div class="control-buttons">
 <button onclick="drawCard()">Draw</button>
 <button onclick="goBack()">Back</button>
@@ -394,6 +402,18 @@ document.getElementById("question-card").style.color = (currentCategory === "Goa
 
     switchCategory(currentCategory);
     updateCategoryButtons();
-  </script>
+  
+
+function sendFeedback(tag) {
+  const category = currentCategory;
+  const question = document.getElementById("question-card").innerText;
+  const baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSe_RADk1KIJbIBIJClrL3Mv8ZzzxTAWjx_-6GqVA9jmHP6BzA/viewform";
+  const params = new URLSearchParams();
+  params.append("entry.250526545", category);
+  params.append("entry.946746809", question);
+  params.append("entry.1474705841", tag);
+  window.open(`${baseUrl}?usp=pp_url&${params.toString()}`, "_blank");
+}
+</script>
 </body>
 </html>
