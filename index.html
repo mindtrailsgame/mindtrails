@@ -1,435 +1,399 @@
+
 <!DOCTYPE html>
 
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Mind Trails – Coaching Cards</title>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mind Trails – Coaching Cards</title>
 <style>
     body {
-      font-family: sans-serif;
-      background: #f0f0f0;
-      text-align: center;
+      font-family: Arial, sans-serif;
+      background-color: #f3f3f3;
+      margin: 0;
       padding: 20px;
+      text-align: center;
     }
-
     h1 {
-      font-size: 24px;
+      font-size: 32px;
       margin-bottom: 10px;
     }
-
     .category-btn {
       display: inline-block;
       margin: 5px;
-      padding: 15px 20px;
-      font-size: 16px;
+      padding: 15px 25px;
+      font-size: 18px;
+      color: #000;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
+      cursor: pointer;
+      opacity: 0.5;
+    }
+    .category-btn.active {
+      opacity: 1;
+      box-shadow: 0 0 8px 3px #00ffff;
+    }
+    .category-btn.unlocked {
+      opacity: 1;
+      cursor: pointer;
+    }
+    #question-card {
+      margin: 20px auto;
+      padding: 25px;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #000;
+    }
+    .control-buttons button {
+      padding: 12px 20px;
+      margin: 10px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      background-color: #444;
       color: white;
       cursor: pointer;
     }
-
-    .Goal { background: #ffffff; color: #000000; border: 1px solid #ccc; }
-    .Support { background: #2e7d32; }
-    .Exploration { background: #0d47a1; }
-    .Challenge { background: #b71c1c; }
-    .Creativity { background: #fbc02d; color: #000; }
-    .Action { background: #ef6c00; }
-
-    .active {
-      outline: 3px solid #000000;
-      transform: scale(1.05);
-      transition: transform 0.2s ease, outline 0.2s ease;
-    }
-
-    #cardBox {
-      margin-top: 30px;
+    .instructions {
+      margin-top: 20px;
       padding: 20px;
+      background-color: white;
+      text-align: left;
       border-radius: 10px;
       display: none;
-      font-size: 20px;
-      max-width: 90%;
-      margin-left: auto;
-      margin-right: auto;
     }
-
-    #followUpBox {
-      margin-top: 15px;
-      font-size: 16px;
-      max-width: 80%;
-      margin-left: auto;
-      margin-right: auto;
-      display: none;
-    }
-
-    #controls {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    button.control-btn {
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 6px;
-      background: #555;
+    .toggle-instructions {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: green;
       color: white;
+      font-size: 24px;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
       cursor: pointer;
     }
-  </style>
-<style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    font-family: sans-serif;
-    background: #f0f0f0;
-    text-align: center;
-  }
-
-  h1 {
-    font-size: clamp(28px, 7vw, 40px);
-    margin: 20px 0 10px 0;
-  }
-
-  p {
-    font-size: clamp(18px, 5vw, 22px);
-  }
-
-  .category-btn {
-    display: inline-block;
-    margin: 6px;
-    padding: 16px 24px;
-    font-size: clamp(18px, 5vw, 24px);
-    border: none !important;
-    outline: none !important;
-    border-radius: 10px;
-    color: black;
-  }
-
-  .active {
-    animation: glow 1.5s infinite alternate;
-    box-shadow: 0 0 6px 2px #66ffff, 0 0 12px 4px #33ccff;
-  }
-
-  #cardBox {
-    margin: 40px auto;
-    padding: 24px;
-    border-radius: 10px;
-    font-size: clamp(20px, 6vw, 26px);
-    max-width: 90%;
-    display: none;
-  }
-
-  #controls {
-    margin-top: 30px;
-  }
-
-  button.control-btn {
-    padding: 14px 28px;
-    margin: 0 12px;
-    font-size: clamp(18px, 5vw, 24px);
-    border: none;
-    border-radius: 8px;
-    background: #555;
-    color: white;
-    cursor: pointer;
-  }
-
-  @keyframes glow {
-    from {
-      box-shadow: 0 0 3px 1px #66ffff, 0 0 6px 2px #33ccff;
-    }
-    to {
-      box-shadow: 0 0 6px 3px #66ffff, 0 0 12px 5px #33ccff;
-    }
-  }
+  
+#Support, #Exploration, #Challenge, #Creativity, #Action {
+  color: white !important;
+}
 </style>
 </head>
 <body>
-<div id="instructions" style="position: fixed; inset: 0; background: #ffffff; color: #000; padding: 24px; overflow-y: auto; z-index: 9999; display: flex; flex-direction: column; justify-content: space-between;">
-<div>
+<h1>Mind Trails</h1>
+<div id="category-buttons">
+<button class="category-btn" id="Goal" style="background-color:#FFFFFF;">Goal</button>
+<button class="category-btn" id="Support" style="background-color:#2C5F2D;">Support</button>
+<button class="category-btn" id="Exploration" style="background-color:#2980B9;">Exploration</button>
+<button class="category-btn" id="Challenge" style="background-color:#C0392B;">Challenge</button>
+<button class="category-btn" id="Creativity" style="background-color:#F1C40F;">Creativity</button>
+<button class="category-btn" id="Action" style="background-color:#E67E22;">Action</button>
+</div>
+<div id="question-card">Click “Draw” to begin.</div>
+<div class="control-buttons">
+<button onclick="drawCard()">Draw</button>
+<button onclick="goBack()">Back</button>
+<button onclick="nextPhase()">Continue to Next Phase</button>
+</div>
+<div class="instructions" id="instructions" style="display: none; text-align: left; margin-top: 20px; background: white; padding: 20px; border-radius: 12px;">
 <h2>Welcome to Mind Trails 🌿</h2>
-<p>This is a card-based reflection game played in <strong>pairs</strong>. One person is the <em>Seeker</em>, and the other is the <em>Guide</em>.</p>
+<p>This is a card-based reflection game played in pairs. One person is the <strong>Seeker</strong>, and the other is the <strong>Guide</strong>.</p>
 <p>The Seeker chooses a challenge or goal. Together, you will walk through <strong>6 card stages</strong> — each helping the Seeker explore, reframe, and move forward.</p>
 <h3>🌀 How It Works:</h3>
 <ol>
-<li><strong>Start with "Goal" cards</strong> to define a challenge.</li>
+<li>Start with <strong>"Goal"</strong> cards to define a challenge.</li>
 <li>Click <strong>“Draw”</strong> to get one reflection question.</li>
 <li>Read it aloud and reflect together.</li>
 <li>After a few cards (or when ready), click <strong>"Next Phase"</strong> to move to the next step.</li>
 <li>You’ll continue through <strong>Support → Exploration → Challenge → Creativity → Action</strong>.</li>
 </ol>
-<p style="margin-top: 20px;">
-      Curious how it sounds in action? <a href="#" onclick="document.getElementById('exampleBlock').style.display='block'; this.style.display='none'; return false;">See Example</a>
-</p>
-<div id="exampleBlock" style="display: none; margin-top: 10px;">
-<h3>🎭 Full Example: Anna &amp; Lukas</h3>
-<p><strong>Context:</strong> Lukas is unsure whether to pursue a promotion or consider a career change. Anna is guiding him.</p>
-<h4>⚪ Step 1: Goal</h4>
-<blockquote>
-        Anna: “What would you like to achieve in the next month?”<br/>
-        Lukas: “I want to feel clear about whether to go for this promotion or explore something new.”
-      </blockquote>
-<h4>🟢 Step 2: Support</h4>
-<blockquote>
-        Anna: “What personal strength has helped you in the past?”<br/>
-        Lukas: “Adaptability. I’ve changed roles before and handled it well.”
-      </blockquote>
-<h4>🔵 Step 3: Exploration</h4>
-<blockquote>
-        Anna: “What have you tried so far to reach your goals?”<br/>
-        Lukas: “Updated my resume, but I keep hesitating.”<br/>
-        Anna: “What’s holding that hesitation in place?”<br/>
-        Lukas: “Fear of making the wrong move.”
-      </blockquote>
-<h4>🔴 Step 4: Challenge</h4>
-<blockquote>
-        Anna: “What negative self-talk do you need to challenge?”<br/>
-        Lukas: “That I won’t succeed elsewhere.”<br/>
-        Anna: “And how true does that feel?”<br/>
-        Lukas: “Less true than it used to.”
-      </blockquote>
-<h4>🟡 Step 5: Creativity</h4>
-<blockquote>
-        Anna: “If this situation were a story, what inspiring twist would you add?”<br/>
-        Lukas: “Maybe I take a sabbatical and stumble into a new opportunity while traveling.”
-      </blockquote>
-<h4>🟠 Step 6: Action</h4>
-<blockquote>
-        Anna: “What’s one small step you can take this week?”<br/>
-        Lukas: “I’ll reach out to that recruiter I’ve been avoiding.”
-      </blockquote>
-<p>✨ They reflect together, feeling more focused and empowered.</p>
+<button onclick="const ex=document.getElementById('example'); ex.style.display=(ex.style.display==='none')?'block':'none'; this.innerText=this.innerText==='See Example'?'Hide Example':'See Example';" style="margin: 10px 0; padding: 6px 16px; font-size: 16px; border: none; border-radius: 6px; background-color: #555; color: white;">
+  See Example
+</button>
+<div id="example" style="display:none;">
+<table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+<tr><th colspan="2" style="background:#eee; padding: 10px;">Participants</th></tr>
+<tr><td style="width:30%; font-weight:bold;">Anna</td><td>Coach</td></tr>
+<tr><td style="font-weight:bold;">Lukas</td><td>Coachee</td></tr>
+<tr><th colspan="2" style="background:#eee; padding: 10px;">Context</th></tr>
+<tr><td colspan="2">Lukas is stuck at work — unsure whether to pursue a promotion or switch careers.</td></tr>
+<tr><th colspan="2" style="background:#eee; padding: 10px;">Conversation Flow</th></tr>
+<tr><td colspan="2"><strong>⚪️ Goal</strong><br/>
+Anna: “What would you like to achieve in the next month?”<br/>
+Lukas: “Clarity about going for a promotion or looking elsewhere.”<br/>
+Anna: “Is this more about figuring out if you still belong at this company?”<br/>
+Lukas: “Yeah… I like the team but not the direction.”</td></tr>
+<tr><td colspan="2"><strong>🟢 Support</strong><br/>
+Anna: “What personal strength has helped you in the past?”<br/>
+Lukas: “Adaptability — I’ve shifted roles before and always landed on my feet.”</td></tr>
+<tr><td colspan="2"><strong>🔵 Exploration</strong><br/>
+Anna: “What have you tried so far?”<br/>
+Lukas: “Updated resume, informal chats... but I keep hesitating.”<br/>
+Anna: “What’s behind the hesitation?”<br/>
+Lukas: “Fear of making the wrong move again.”</td></tr>
+<tr><td colspan="2"><strong>🔴 Challenge</strong><br/>
+Anna: “What negative self-talk do you need to challenge?”<br/>
+Lukas: “That I won’t succeed elsewhere.”<br/>
+Anna: “And how true does that feel?”<br/>
+Lukas: “Less than before. I’ve made bigger leaps.”</td></tr>
+<tr><td colspan="2"><strong>🟡 Creativity</strong><br/>
+Anna: “If this were a story, what twist would you add?”<br/>
+Lukas: “I’d travel and discover a new career path by accident.”</td></tr>
+<tr><td colspan="2"><strong>🟠 Action</strong><br/>
+Anna: “What’s one specific step you can take this week?”<br/>
+Lukas: “Reach out to that recruiter I’ve been avoiding.”<br/>
+Anna: “Great. I’ll check in next week.”</td></tr>
+<tr><th colspan="2" style="background:#eee; padding: 10px;">Closing</th></tr>
+<tr><td colspan="2">Coach: “Looking back — what surprised you most? What do you want to carry forward?”</td></tr>
+</table>
+</div></div>
+<button class="toggle-instructions" onclick="toggleInstructions()">?</button>
+<div style="text-align:right;">
+<button onclick="document.getElementById('instructions').style.display = (document.getElementById('instructions').style.display === 'none') ? 'block' : 'none';" style="position: fixed; bottom: 20px; right: 20px; background-color: #2C5F2D; color: white; font-size: 28px; border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer;">
+    ?
+  </button>
 </div>
-</div>
-<div style="text-align: center; margin-top: 20px;">
-<button onclick="document.getElementById('instructions').style.display='none'" style="padding: 14px 28px; font-size: 18px; border: none; background: #2C5F2D; color: white; border-radius: 8px;">Start the Journey</button>
-</div>
-</div>
-<!-- Floating Help Button -->
+<div id="instructions" style="display: none; text-align: left; margin-top: 20px; background: white; padding: 20px; border-radius: 12px;">
+<h2>How to Play</h2>
+<p><strong>Mind Trails</strong> is a coaching card game played in pairs. One is the Seeker (who brings a challenge), and one is the Guide (who helps explore it).</p>
+<ol>
+<li><strong>Goal</strong>: Start with a question to define the challenge.</li>
+<li><strong>Draw</strong>: Receive one card per phase and discuss together.</li>
+<li><strong>Continue to Next Phase</strong>: When ready, move forward through all 6 phases.</li>
+</ol>
+<button onclick="const ex=document.getElementById('example'); ex.style.display=(ex.style.display==='none')?'block':'none'; this.innerText=this.innerText==='See Example'?'Hide Example':'See Example';" style="margin: 10px 0; padding: 6px 16px; font-size: 16px; border: none; border-radius: 6px; background-color: #555; color: white;">
+    See Example
+  </button>
+<div id="example" style="display:none;">
+<pre style="white-space: pre-wrap; font-size: 14px;">
+Participants:
+  Anna (Coach)
+  Lukas (Coachee)
 
-<!-- Floating Help Button -->
+Context:
+  Lukas is feeling stuck at work — unsure whether to pursue a promotion or switch to a different career path.
 
-<h1>Mind Trails</h1>
-<p>Select a category:</p>
-<div id="categories">
-<button class="category-btn Goal" onclick="selectCategory('Goal', this)">Goal ⚪</button>
-<button class="category-btn Support" onclick="selectCategory('Support', this)">Support 🟢</button>
-<button class="category-btn Exploration" onclick="selectCategory('Exploration', this)">Exploration 🔵</button>
-<button class="category-btn Challenge" onclick="selectCategory('Challenge', this)">Challenge 🔴</button>
-<button class="category-btn Creativity" onclick="selectCategory('Creativity', this)">Creativity 🟡</button>
-<button class="category-btn Action" onclick="selectCategory('Action', this)">Action 🟠</button>
+🟠 START SCREEN (Instructions for Both)
+Coach reads aloud:
+  “Let’s go through six steps to explore your challenge. Each step has a few cards.
+You’ll reflect on one question per phase. Let’s begin.”
+
+⚪️ STEP 1 – Goal (White)
+Anna: “Here’s the first question: What would you like to achieve in the next month?”
+Lukas: “I’d like clarity about whether to go for this internal promotion or look elsewhere.”
+Anna: “Okay, so you want more clarity. Is this more about figuring out if you still belong in this company?”
+Lukas: “Yeah… I feel torn. I like the team but not the direction.”
+
+🟢 STEP 2 – Support (Green)
+Anna: “What personal strength has helped you in the past?”
+Lukas: “Hm... Probably adaptability. I’ve shifted roles before and always landed on my feet.”
+Anna: “That’s big. Can you think of a time that reminds you of now?”
+Lukas: “Yeah — when I left sales to go into product design.”
+
+🔵 STEP 3 – Exploration (Blue)
+Anna: “What have you tried so far to reach your goals?”
+Lukas: “I’ve updated my resume and had a few informal conversations... but I keep hesitating.”
+Anna: “What’s behind the hesitation?”
+Lukas: “I think it’s fear — of making the wrong move again.”
+
+🔴 STEP 4 – Challenge (Red)
+Anna: “What negative self-talk do you need to challenge?”
+Lukas: “Probably that ‘I won’t succeed elsewhere.’ That’s a huge one for me.”
+Anna: “And how true does that feel, really?”
+Lukas: “Less true than it used to. I’ve made bigger jumps before.”
+
+🟡 STEP 5 – Creativity (Yellow)
+Anna: “If this situation were a story you’re writing, what surprising twist would you add to make it inspiring and fun?”
+Lukas: (laughs) “Maybe I’d take a sabbatical to travel — and end up discovering a new field by accident.”
+Anna: “That’s beautiful. It tells me you’re craving something more expansive.”
+
+🟠 STEP 6 – Action (Orange)
+Anna: “What’s one specific step you can take this week to move closer to your goal?”
+Lukas: “I’ll set up a meeting with that recruiter I’ve been putting off. Just to talk.”
+Anna: “Perfect. And I’ll follow up with you next week. Sound good?”
+Lukas: “Yeah. Thanks — this really helped untangle things.”
+
+🌀 End of Trail
+Coach: “Looking back — what surprised you most? What do you want to carry forward?”
+    </pre>
 </div>
-<div id="cardBox"></div>
-<div id="followUpBox"></div>
-<div id="controls">
-<button class="control-btn" onclick="drawCard()">🎴 Draw</button>
-<button class="control-btn" onclick="prevCard()">⬅️ Back</button>
-<button class="control-btn" id="showFollowUp" onclick="showFollowUp()" style="display: none;">Help, I'm stuck</button>
 </div>
 <script>
     const questions = {
-      Goal: [
-        "What's one area of your life you'd like to improve?",
-        "What's a challenge you're facing right now?",
-        "What would you like to achieve in the next month?",
-        "If you could change one thing about your current situation, what would it be?",
-        "What skill would you most like to develop?",
-        "What new skill or habit would make the biggest difference for you?",
-        "What small achievement would feel like a big victory for you right now?",
-        "Imagine your future self sending you a postcard. What accomplishment would they be celebrating?",
-        "What is one brave first step you can imagine taking?",
-        "What are you willing to leave behind in order to move forward?"
-      ],
-      Support: [
-        "What’s a recent accomplishment you’re proud of?",
-        "Who are your 'roots' – people or beliefs that keep you going?",
-        "What personal strength has helped you in the past?",
-        "When do you feel most confident?",
-        "What’s something you’ve overcome that you didn’t think you could?",
-        "When and how have you turned a difficult situation into something positive?",
-        "What gives you energy when you feel tired or discouraged?",
-        "How does the way you support others reveal your own inner resources?",
-        "What reminds you that you’re capable, even on hard days?",
-        "Think of a time when you felt unstoppable. What were you doing?"
-      ],
-      Exploration: [
-        "How do you usually respond when faced with rejection?",
-        "What would success look like for you in the next few months?",
-        "What’s something you haven’t tried yet but are curious about?",
-        "How does your current situation affect your daily life?",
-        "What have you tried so far to reach your goals?",
-        "What motivates you to make a change?",
-        "When do you feel most confident in your abilities?",
-        "What part do you usually play when working in a group?",
-        "What is the biggest obstacle standing between you and your ideal outcomes?",
-        "How would achieving your goal impact other areas of your life?"
-      ],
-      Challenge: [
-        "What's holding you back from taking the next step?",
-        "What negative self-talk do you need to challenge?",
-        "What responsibility do you need to take for your current situation?",
-        "What makes rejection feel so tough?",
-        "What makes you doubt you are good enough for certain roles?",
-        "What is unclear for you about the things you want?",
-        "When have you felt like your efforts wouldn’t pay off?",
-        "Whose external factors are influencing your choices?",
-        "Who supports you — and who should be supporting you?",
-        "What holds you back from making a change?"
-      ],
-      Action: [
-        "What’s one specific step you can take this week to move closer to your goal?",
-        "What’s one small thing you can do tomorrow that feels exciting or doable for you?",
-        "Who could you reach out to for support or encouragement to help you take this step?",
-        "How will you remind yourself to follow through on your next step, like a note or a phone alert?",
-        "What obstacle might pop up, and what’s one way you could handle it to stay on track?",
-        "How will you celebrate or reward yourself when you complete this action, big or small?",
-        "What new habit or routine could you start to support your goal, even if it’s super simple?",
-        "What’s one resource—like a person, book, or website—you could explore to help you move forward?",
-        "What skill or action will you practice this week to build confidence in your plan?",
-        "What’s one thing you’ll do differently this week to make progress, and when will you start?"
-      ],
-      Creativity: [
-        "If you could wave a magic wand to transform this challenge, what would the solution look like?",
-        "What would someone you admire—real or fictional—do to tackle this situation in a totally unexpected way?",
-        "If your future self could send you a message about this challenge, what bold, creative idea would they suggest trying?",
-        "How could you flip this challenge into an exciting opportunity?",
-        "If this situation were a story you’re writing, what surprising twist would you add to make it inspiring and fun?",
-        "What’s a wild, out-of-the-box idea you haven’t considered yet that could shake things up?",
-        "Imagine you’re a superhero facing this challenge. What unique power would you use?",
-        "If you could solve this problem in any way, no limits, what crazy or cool solution would you dream up?",
-        "What would you try if you knew you couldn’t fail, and how would it feel to make it happen?",
-        "If this challenge were a puzzle, what completely new way could you rearrange the pieces to solve it?"
-      ]
-    };
-
-    const followUps = {
-  "If you could wave a magic wand to transform this challenge, what would the solution look like?": [
-    "Zoom in: what’s one tiny version of that idea you could try today?",
-    "What would change in you if this solution actually appeared?"
+  "Goal": [
+    "What's one area of your life you'd like to improve?",
+    "What's a challenge you're facing right now?",
+    "What would you like to achieve in the next month?",
+    "If you could change one thing about your current situation, what would it be?",
+    "What skill would you most like to develop?",
+    "What new skill or habit would make the biggest difference for you?",
+    "What small achievement would feel like a big victory for you right now?",
+    "Imagine your future self sending you a postcard. What accomplishment would they be celebrating?",
+    "What is one brave first step you can imagine taking?",
+    "What are you willing to leave behind in order to move forward?"
   ],
-  "What would someone you admire—real or fictional—do to tackle this situation in a totally unexpected way?": [
-    "What part of that bold approach could you actually experiment with?",
-    "Picture them handing the idea back to you. What do they say?"
+  "Support": [
+    "What’s a recent accomplishment you’re proud of?",
+    "Who are your “roots” - people or beliefs that keep you going?",
+    "What personal strength has helped you in the past?",
+    "When do you feel most confident?",
+    "What’s something you’ve overcome that you didn’t think you could?",
+    "When and how have you turned a difficult situation into something positive?",
+    "What gives you energy when you feel tired or discouraged?",
+    "How does the way you support others reveal your own inner resources?",
+    "What reminds you that you’re capable, even on hard days?",
+    "Think of a time when you felt unstoppable. What were you doing?"
   ],
-  "If your future self could send you a message about this challenge, what bold, creative idea would they suggest trying?": [
-    "What’s the tiniest step your future self would cheer you on for?",
-    "If they added a PS, what might it say?"
+  "Exploration": [
+    "How do you usually respond when faced with rejection?",
+    "What would success look like for you in the next few months?",
+    "What’s something you haven’t tried yet but are curious about?",
+    "How does your current situation affect your daily life?",
+    "What have you tried so far to reach your goals?",
+    "What motivates you to make a change?",
+    "When do you feel most confident in your abilities?",
+    "What part do you usually play when working in a group?",
+    "What is the biggest obstacle standing between you and your ideal outcomes?",
+    "How would achieving your goal impact other areas of your life?"
   ],
-  "How could you flip this challenge into an exciting opportunity?": [
-    "What’s something only *you* could do with this challenge?",
-    "Imagine telling someone the story afterward. How do you describe the twist?"
+  "Challenge": [
+    "What's holding you back from taking the next step?",
+    "What negative self-talk do you need to challenge?",
+    "What responsibility do you need to take for your current situation?",
+    "What makes rejection feel so tough?",
+    "What makes you doubt you are good enough for certain roles?",
+    "What is unclear for you about the things you want?",
+    "When have you felt like your efforts wouldn’t pay off?",
+    "Whose external factors are influencing your choices?",
+    "Who supports you — and who should be supporting you?",
+    "What holds you back from making a change?"
   ],
-  "If this situation were a story you’re writing, what surprising twist would you add to make it inspiring and fun?": [
-    "What title would you give the next chapter?",
-    "What image or scene captures the shift you’re imagining?"
+  "Creativity": [
+    "If you could wave a magic wand to transform this challenge, what would the solution look like, and how would it change things for you?",
+    "What would someone you admire—real or fictional—do to tackle this situation in a totally unexpected way?",
+    "If your future self could send you a message about this challenge, what bold, creative idea would they suggest trying?",
+    "How could you flip this challenge into an exciting opportunity, like turning a problem into a chance to shine?",
+    "If this situation were a story you’re writing, what surprising twist would you add to make it inspiring and fun?",
+    "What’s a wild, out-of-the-box idea you haven’t considered yet that could shake things up?",
+    "Imagine you’re a superhero facing this challenge. What unique power would you use, and how would you save the day?",
+    "If you could solve this problem in any way, no limits, what crazy or cool solution would you dream up?",
+    "What would you try if you knew you couldn’t fail, and how would it feel to make it happen?",
+    "If this challenge were a puzzle, what completely new way could you rearrange the pieces to solve it?"
   ],
-  "What’s a wild, out-of-the-box idea you haven’t considered yet that could shake things up?": [
-    "Sit with the idea for a few seconds. What detail would make it more exciting or more *you*?",
-    "Try flipping it: what’s the opposite of that idea—and what does that show you?"
-  ],
-  "Imagine you’re a superhero facing this challenge. What unique power would you use?": [
-    "What allies or tools would show up to help you?",
-    "What’s the scene where you save the day? What makes it satisfying?"
-  ],
-  "If you could solve this problem in any way, no limits, what crazy or cool solution would you dream up?": [
-    "Which part of the idea feels the most alive to you?",
-    "Could this big idea have a small test run?"
-  ],
-  "What would you try if you knew you couldn’t fail, and how would it feel to make it happen?": [
-    "Who else might be quietly hoping you try it?",
-    "What’s one version of this you could try just for fun?"
-  ],
-  "If this challenge were a puzzle, what completely new way could you rearrange the pieces to solve it?": [
-    "What piece have you been ignoring, and what might it unlock?",
-    "Try rotating the whole puzzle. What changes?"
+  "Action": [
+    "What’s one specific step you can take this week to move closer to your goal?",
+    "What’s one small thing you can do tomorrow that feels exciting or doable for you?",
+    "Who could you reach out to for support or encouragement to help you take this step?",
+    "How will you remind yourself to follow through on your next step, like a note or a phone alert?",
+    "What obstacle might pop up, and what’s one way you could handle it to stay on track?",
+    "How will you celebrate or reward yourself when you complete this action, big or small?",
+    "What new habit or routine could you start to support your goal, even if it’s super simple?",
+    "What’s one resource—like a person, book, or website—you could explore to help you move forward?",
+    "What skill or action will you practice this week to build confidence in your plan?",
+    "What’s one thing you’ll do differently this week to make progress, and when will you start?"
   ]
 };
 
-    const bgColors = {
-      Goal: "#ffffff",
-      Support: "#2e7d32",
-      Exploration: "#0d47a1",
-      Challenge: "#b71c1c",
-      Creativity: "#fbc02d",
-      Action: "#ef6c00"
-    };
+    const categoryOrder = ["Goal", "Support", "Exploration", "Challenge", "Creativity", "Action"];
+    let currentCategoryIndex = 0;
+    let currentCategory = categoryOrder[currentCategoryIndex];
+    let history = [];
+    let shownIndices = { Goal: [], Support: [], Exploration: [], Challenge: [], Creativity: [], Action: [] };
 
-    const textColors = {
-      Goal: "#000000",
-      Support: "#ffffff",
-      Exploration: "#ffffff",
-      Challenge: "#ffffff",
-      Creativity: "#000000",
-      Action: "#ffffff",
-      Default: "#000000"
-    };
+    function updateCategoryButtons() {
+      categoryOrder.forEach((cat, idx) => {
+        const btn = document.getElementById(cat);
+        if (idx < currentCategoryIndex) {
+          btn.classList.add("unlocked");
+          btn.onclick = () => switchCategory(cat);
+        } else if (idx === currentCategoryIndex) {
+          btn.classList.add("active");
+          btn.classList.remove("unlocked");
+        } else {
+          btn.classList.remove("unlocked", "active");
+          btn.onclick = null;
+        }
+      });
+    }
 
-    let currentCategory = "";
-    let questionHistory = [];
-    let currentIndex = -1;
-    let remaining = [];
-
-    function selectCategory(category, button) {
-      currentCategory = category;
-      questionHistory = [];
-      currentIndex = -1;
-      remaining = [...questions[category]];
-      document.getElementById("cardBox").style.display = "none";
-      document.getElementById("followUpBox").style.display = "none";
-      document.getElementById("showFollowUp").style.display = "none";
-      document.querySelectorAll(".category-btn").forEach(btn => btn.classList.remove("active"));
-      button.classList.add("active");
+    function switchCategory(cat) {
+      currentCategory = cat;
+      currentCategoryIndex = categoryOrder.indexOf(cat);
+      updateCategoryButtons();
+      document.getElementById("question-card").style.backgroundColor = document.getElementById(cat).style.backgroundColor;
+      
+document.getElementById("question-card").innerText = "Click Draw to begin.";
+let bg = document.getElementById(currentCategory).style.backgroundColor;
+document.getElementById("question-card").style.backgroundColor = bg;
+document.getElementById("question-card").style.color = (currentCategory === "Goal") ? "#000000" : "#ffffff";
+        
     }
 
     function drawCard() {
-      if (!currentCategory || remaining.length === 0) return;
-      const randomIndex = Math.floor(Math.random() * remaining.length);
-      const nextQuestion = remaining.splice(randomIndex, 1)[0];
-      questionHistory.push(nextQuestion);
-      currentIndex = questionHistory.length - 1;
-      displayCard(nextQuestion);
+      const options = questions[currentCategory];
+      const used = shownIndices[currentCategory];
+      const remaining = options.filter((_, idx) => !used.includes(idx));
+      if (remaining.length === 0) return;
+      const idx = options.indexOf(remaining[0]);
+      shownIndices[currentCategory].push(idx);
+      history.push({ category: currentCategory, question: options[idx] });
+      document.getElementById("question-card").style.backgroundColor = document.getElementById(currentCategory).style.backgroundColor;
+      
+document.getElementById("question-card").innerText = options[idx];
+let bg = document.getElementById(currentCategory).style.backgroundColor;
+document.getElementById("question-card").style.backgroundColor = bg;
+document.getElementById("question-card").style.color = (currentCategory === "Goal") ? "#000000" : "#ffffff";
+        
+
+    let cardTextColor = (currentCategory === "Goal") ? "#000000" : "#ffffff";
+    document.getElementById("question-card").style.color = cardTextColor;
+    
     }
 
-    function prevCard() {
-      if (currentIndex > 0) {
-        currentIndex--;
-        displayCard(questionHistory[currentIndex]);
+    function goBack() {
+      for (let i = history.length - 2; i >= 0; i--) {
+        if (history[i].category === currentCategory) {
+          history.pop();
+          const prev = history[history.length - 1];
+          document.getElementById("question-card").style.backgroundColor = document.getElementById(prev.category).style.backgroundColor;
+          document.getElementById("question-card").innerText = prev.question;
+          return;
+        }
       }
     }
 
-    function displayCard(text) {
-      const cardBox = document.getElementById('cardBox');
-      const followUpBox = document.getElementById('followUpBox');
-      const helpBtn = document.getElementById('showFollowUp');
-
-      cardBox.textContent = text;
-      cardBox.style.display = 'block';
-      cardBox.style.background = bgColors[currentCategory];
-      cardBox.style.color = textColors[currentCategory] || textColors.Default;
-
-      followUpBox.style.display = 'none';
-      helpBtn.style.display = (currentCategory === 'Creativity' && followUps[text]) ? 'inline-block' : 'none';
-    }
-
-    function showFollowUp() {
-      const followUpBox = document.getElementById('followUpBox');
-      const currentText = questionHistory[currentIndex];
-      if (followUps[currentText]) {
-        const promptList = followUps[currentText];
-        const prompt = promptList[Math.floor(Math.random() * promptList.length)];
-        followUpBox.innerHTML = "<strong>Follow-up:</strong> " + prompt;
-        followUpBox.style.display = 'block';
+    function nextPhase() {
+      if (currentCategoryIndex < categoryOrder.length - 1) {
+        currentCategoryIndex++;
+        currentCategory = categoryOrder[currentCategoryIndex];
+        updateCategoryButtons();
+        document.getElementById("question-card").style.backgroundColor = document.getElementById(currentCategory).style.backgroundColor;
+        
+document.getElementById("question-card").innerText = "Click Draw to begin.";
+let bg = document.getElementById(currentCategory).style.backgroundColor;
+document.getElementById("question-card").style.backgroundColor = bg;
+document.getElementById("question-card").style.color = (currentCategory === "Goal") ? "#000000" : "#ffffff";
+        
       }
     }
+
+    function toggleInstructions() {
+      const el = document.getElementById("instructions");
+      el.style.display = el.style.display === "none" ? "block" : "none";
+    }
+
+    function toggleExample() {
+      const ex = document.getElementById("example");
+      ex.style.display = ex.style.display === "none" ? "block" : "none";
+    }
+
+    switchCategory(currentCategory);
+    updateCategoryButtons();
   </script>
-
-<!-- Floating Help Icon -->
-<button onclick="document.getElementById('instructions').style.display='flex'" style="position: fixed; bottom: 16px; right: 16px; width: 50px; height: 50px; border-radius: 50%; background: #2C5F2D; color: white; border: none; font-size: 28px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 10000;">
-  ?
-</button>
 </body>
 </html>
