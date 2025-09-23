@@ -11,17 +11,12 @@
 @media (max-width: 600px) {
     #card-container {
         scroll-snap-type: x mandatory;
-        /* Add flex properties to help center the adaptive card */
         display: flex;
         align-items: center;
     }
 
     .card {
         flex-basis: 85%;
-        /* REMOVE the fixed height property */
-        /* height: 340px; <-- DELETE THIS LINE */
-
-        /* ADD these properties for an adaptive layout */
         aspect-ratio: 2 / 3; /* Maintains a consistent card shape */
         min-height: 300px;   /* Prevents it from getting too small */
         max-height: 420px;   /* Prevents it from getting too tall on narrow screens */
