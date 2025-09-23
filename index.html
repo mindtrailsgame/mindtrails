@@ -8,31 +8,37 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-    @media (max-width: 600px) {
-        #card-container {
-            /* This makes the card carousel 'snap' into place when you swipe */
-            scroll-snap-type: x mandatory;
-        }
-
-        .card {
-            /* Make each card take up 85% of the screen width */
-            flex-basis: 85%;
-            /* Adjust height for a better mobile aspect ratio */
-            height: 200px; 
-            /* This tells each card to snap to the center of the screen */
-            scroll-snap-align: center;
-        }
-
-        /* Optional: Make the bottom controls a bit smaller on narrow screens */
-        .game-controls-bottom {
-            gap: 15px;
-            padding: 8px 15px;
-        }
-        #complete-btn {
-            padding: 8px 20px;
-            font-size: 16px;
-        }
+@media (max-width: 600px) {
+    #card-container {
+        scroll-snap-type: x mandatory;
+        /* Add flex properties to help center the adaptive card */
+        display: flex;
+        align-items: center;
     }
+
+    .card {
+        flex-basis: 85%;
+        /* REMOVE the fixed height property */
+        /* height: 340px; <-- DELETE THIS LINE */
+
+        /* ADD these properties for an adaptive layout */
+        aspect-ratio: 2 / 3; /* Maintains a consistent card shape */
+        min-height: 300px;   /* Prevents it from getting too small */
+        max-height: 420px;   /* Prevents it from getting too tall on narrow screens */
+        
+        scroll-snap-align: center;
+    }
+
+    /* Bottom controls styling remains the same */
+    .game-controls-bottom {
+        gap: 15px;
+        padding: 8px 15px;
+    }
+    #complete-btn {
+        padding: 8px 20px;
+        font-size: 16px;
+    }
+}
 
     /* General Styles */
     body {
