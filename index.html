@@ -1,419 +1,633 @@
-
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Mind Trails – Coaching Cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+    @media (max-width: 600px) {
+        #card-container {
+            /* This makes the card carousel 'snap' into place when you swipe */
+            scroll-snap-type: x mandatory;
+        }
+
+        .card {
+            /* Make each card take up 85% of the screen width */
+            flex-basis: 85%;
+            /* Adjust height for a better mobile aspect ratio */
+            height: 380px; 
+            /* This tells each card to snap to the center of the screen */
+            scroll-snap-align: center;
+        }
+
+        /* Optional: Make the bottom controls a bit smaller on narrow screens */
+        .game-controls-bottom {
+            gap: 15px;
+            padding: 8px 15px;
+        }
+        #complete-btn {
+            padding: 8px 20px;
+            font-size: 16px;
+        }
+    }
+
+    /* General Styles */
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Josefin Sans', sans-serif;
       background-color: #f3f3f3;
       margin: 0;
-      padding: 20px;
+      padding: 0;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      box-sizing: border-box;
     }
-    h1 {
-      font-size: 32px;
-      margin-bottom: 10px;
+
+    /* Screen Management */
+    .screen {
+        display: none;
+        width: 100%;
+        height: 100vh;
+        max-width: 800px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
-    .category-btn {
-      display: inline-block;
-      margin: 5px;
-      padding: 15px 25px;
-      font-size: 18px;
-      color: #000;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      opacity: 0.5;
+
+    /* 1. START SCREEN (MENU) */
+
+    #game-logo-img {
+        width: 300px; /* Adjust this value to make the logo bigger or smaller */
+        height: auto; /* This keeps the image's proportions correct */
     }
-    .category-btn.active {
-      opacity: 1;
-      box-shadow: 0 0 8px 3px #00ffff;
+
+    .menu-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
-    .category-btn.unlocked {
-      opacity: 1;
-      cursor: pointer;
+    .menu-buttons button {
+        padding: 15px 30px; font-size: 20px; border-radius: 12px;
+        border: none; cursor: pointer; margin: 10px;
+        background-color: #2C5F2D; color: white;
+        font-family: 'Josefin Sans', sans-serif;
+      
     }
-    #question-card {
-      margin: 20px auto;
-      padding: 25px;
-      width: 80%;
-      max-width: 600px;
-      border-radius: 15px;
-      font-size: 20px;
-      font-weight: bold;
-      color: #000;
+    
+    /* 2. GOAL INPUT SCREEN */
+    #goal-input-screen-content {
+        padding: 40px; background-color: white; border-radius: 15px; margin: 20px;
     }
-    .control-buttons button {
-      padding: 12px 20px;
-      margin: 10px;
-      font-size: 18px;
-      border-radius: 10px;
-      border: none;
-      background-color: #444;
-      color: white;
-      cursor: pointer;
+    #goal-input-screen-content h2 { font-size: 28px; margin-bottom: 20px; }
+    #goal-input-screen-content .goal-prefix { font-size: 20px; color: #555; }
+    #goal-input {
+        width: 80%; padding: 12px; font-size: 18px; border: 2px solid #ccc;
+        border-radius: 8px; margin-top: 10px; font-family: 'Josefin Sans', sans-serif;
     }
-    .instructions {
-      margin-top: 20px;
-      padding: 20px;
-      background-color: white;
-      text-align: left;
-      border-radius: 10px;
-      display: none;
+    #goal-submit-btn {
+        margin-top: 20px; padding: 12px 25px; font-size: 18px;
+        background-color: #4365b0; color: white; border: none;
+        border-radius: 8px; cursor: pointer; font-family: 'Josefin Sans', sans-serif;
     }
-    .toggle-instructions {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: green;
-      color: white;
-      font-size: 24px;
-      border: none;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      cursor: pointer;
+
+    /* 3. GAME SCREEN */
+    .game-controls-top {
+        position: absolute; top: 20px; left: 20px; display: flex;
+        gap: 10px; z-index: 100;
+    }
+    .game-controls-bottom {
+        position: absolute; bottom: 20px; left: 50%;
+        transform: translateX(-50%); display: flex; gap: 20px; z-index: 100;
+        background-color: rgba(255, 255, 255, 0.9); padding: 10px 20px;
+        border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .control-icon {
+        font-size: 28px; cursor: pointer; width: 45px; height: 45px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%; user-select: none; transition: background-color 0.2s;
+    }
+    #complete-btn {
+        padding: 10px 25px;
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 18px;
+        font-weight: 600;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        background-color: #4365b0;
+        color: white;
+        transition: background-color 0.3s, opacity 0.3s;
+    }
+
+    #complete-btn.completed {
+        background-color: #2C5F2D;
+        cursor: default;
+    }
+    .nav-arrow {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: 2px solid #ccc;
+        background-color: #f0f0f0;
+        cursor: pointer;
+        position: relative;
+        transition: background-color 0.3s, opacity 0.3s;
+    }
+
+    /* This pseudo-element creates the triangle shape */
+    .nav-arrow::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-color: transparent;
+    }
+
+    /* Positioning for the right arrow */
+    .nav-arrow.right::before {
+        border-width: 8px 0 8px 10px;
+        border-left-color: #FFFFFF;
+        transform: translate(-40%, -50%);
+    }
+
+    /* Positioning for the left arrow */
+    .nav-arrow.left::before {
+        border-width: 8px 10px 8px 0;
+        border-right-color: #FFFFFF;
+        transform: translate(-60%, -50%);
+    }
+
+    /* Style for the disabled state */
+    .nav-arrow.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        background-color: #e0e0e0;
+        border-color: #d0d0d0;
+    }
+    .nav-arrow.disabled::before {
+        border-left-color: #999;
+        border-right-color: #999;
+    }
+
+    .game-controls-top .control-icon {
+        background-color: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .control-icon:hover { background-color: #e0e0e0; }
+
+    #card-container {
+        padding: 20px; margin: auto 0; display: flex; gap: 20px;
+        overflow-x: auto; perspective: 1000px; -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+    .card {
+        flex: 0 0 220px; height: 320px; position: relative; cursor: pointer;
+        transform-style: preserve-3d; transition: transform 0.6s;
+    }
+    .card.flipped { transform: rotateY(180deg); }
+    
+    /* This rule is crucial - it stacks the front and back faces */
+    .card-face {
+        position: absolute;
+        width: 100%; height: 100%;
+        backface-visibility: hidden;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        box-sizing: border-box;
+    }
+
+  
+    .card-front {
+        display: flex;
+        flex-direction: column;
+
+        padding: 20px 0;
+    }
+    .card-front .category-title {
+        font-size: 20px; 
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .icon-container {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 0;
     }
   
-#Support, #Exploration, #Challenge, #Creativity, #Action {
-  color: white !important;
-}
+    .card-front .card-icon {
+        width: 100%; 
+        height: auto;
+        object-fit: contain;
+     
+    }
+    .card-front .clarifying-word {
+        font-size: 22px;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+    
+    .card-back {
+        transform: rotateY(180deg);
+        font-size: 19px;
+        font-weight: 400;
+        justify-content: center;
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+    
+    #word-cloud-modal {
+        display: none; position: fixed; z-index: 1000;
+        left: 0; top: 0; width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.6);
+        justify-content: center; align-items: center;
+    }
+    #word-cloud-content {
+        background-color: white; padding: 30px; border-radius: 15px;
+        display: flex; flex-wrap: wrap; gap: 15px; max-width: 600px;
+        justify-content: center;
+    }
+    .word-cloud-item {
+        padding: 10px 20px; border: 2px solid #ccc; border-radius: 20px;
+        cursor: pointer; font-size: 16px; transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .word-cloud-item:hover { background-color: #333; color: white; }
+    
+    .instructions {
+      display: none; position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%); width: 90%; max-width: 700px;
+      max-height: 80vh; overflow-y: auto;
+      background-color: white; padding: 25px; border-radius: 12px;
+      text-align: left; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1001;
+    }
+    .category-indicator {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        margin-right: 8px;
+        vertical-align: middle;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+    .category-indicator.goal { background-color: #4abd93; }
+    .category-indicator.support { background-color: #2e7040; }
+    .category-indicator.exploration { background-color: #4365b0; }
+    .category-indicator.challenge { background-color: #cd2727; }
+    .category-indicator.creativity { background-color: #f8b019; }
+    .category-indicator.action { background-color: #f26622; }
+
+    .instructions table {
+        width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 15px;
+    }
+    .instructions th, .instructions td {
+        border: 1px solid #ddd; padding: 8px; text-align: left;
+    }
+    .instructions th { background-color: #f2f2f2; }
+    .instructions button {
+        display: block; margin: 20px auto 0; padding: 10px 25px;
+        font-size: 16px; font-family: 'Josefin Sans', sans-serif; cursor: pointer;
+    }
 </style>
 </head>
 <body>
-<h1>Mind Trails</h1>
-<div id="category-buttons">
-<button class="category-btn" id="Goal" style="background-color:#FFFFFF;">Goal</button>
-<button class="category-btn" id="Support" style="background-color:#2C5F2D;">Support</button>
-<button class="category-btn" id="Exploration" style="background-color:#2980B9;">Exploration</button>
-<button class="category-btn" id="Challenge" style="background-color:#C0392B;">Challenge</button>
-<button class="category-btn" id="Creativity" style="background-color:#F1C40F;">Creativity</button>
-<button class="category-btn" id="Action" style="background-color:#E67E22;">Action</button>
-</div>
-<div id="question-card">Click “Draw” to begin.</div>
-<div id="feedback-panel" style="margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-<button onclick="sendFeedback('Clear')" style="padding: 6px 12px;">🙋‍♂️ Clear</button>
-<button onclick="sendFeedback('Thought-Provoking')" style="padding: 6px 12px;">🤯 Thought-Provoking</button>
-<button onclick="sendFeedback('Confusing')" style="padding: 6px 12px;">😕 Confusing</button>
-<button onclick="sendFeedback('Want to Rephrase')" style="padding: 6px 12px;">💬 Want to Rephrase</button>
-<button onclick="sendFeedback('Useful but Hard to Answer')" style="padding: 6px 12px;">📌 Useful but Hard to Answer</button>
+
+<div id="start-screen" class="screen">
+    <div class="game-logo">
+        <img id="game-logo-img" src="images/mind_trails_logo.png" alt= "Mind Trails Logo">
+    </div>
+    <div class="menu-buttons">
+        <button onclick="showScreen('goal-input-screen')">Start</button>
+        <button onclick="toggleInstructions(true)">Instructions</button>
+        <button onclick="toggleControls(true)">Controls</button>
+    </div>
 </div>
 
-<div class="control-buttons">
-<button onclick="drawCard()">Draw</button>
-<button onclick="goBack()">Back</button>
-<button onclick="nextPhase()">Continue to Next Phase</button>
+<div id="goal-input-screen" class="screen">
+    <div id="goal-input-screen-content">
+        <h2>What is your challenge or goal?</h2>
+        <label for="goal-input" class="goal-prefix">My goal is to...</label><br>
+        <input type="text" id="goal-input" placeholder="...overcome my fear of public speaking."><br>
+        <button id="goal-submit-btn" onclick="startGame()">Continue</button>
+    </div>
 </div>
-<div class="instructions" id="instructions" style="display: none; text-align: left; margin-top: 20px; background: white; padding: 20px; border-radius: 12px;">
-<h2>Welcome to Mind Trails 🌿</h2>
-<p>This is a card-based reflection game played in pairs. One person is the <strong>Seeker</strong>, and the other is the <strong>Guide</strong>.</p>
-<p>The Seeker chooses a challenge or goal. Together, you will walk through <strong>6 card stages</strong> — each helping the Seeker explore, reframe, and move forward.</p>
-<h3>🌀 How It Works:</h3>
-<ol>
-<li>Start with <strong>"Goal"</strong> cards to define a challenge.</li>
-<li>Click <strong>“Draw”</strong> to get one reflection question.</li>
-<li>Read it aloud and reflect together.</li>
-<li>After a few cards (or when ready), click <strong>"Next Phase"</strong> to move to the next step.</li>
-<li>You’ll continue through <strong>Support → Exploration → Challenge → Creativity → Action</strong>.</li>
-</ol>
-<button onclick="const ex=document.getElementById('example'); ex.style.display=(ex.style.display==='none')?'block':'none'; this.innerText=this.innerText==='See Example'?'Hide Example':'See Example';" style="margin: 10px 0; padding: 6px 16px; font-size: 16px; border: none; border-radius: 6px; background-color: #555; color: white;">
-  See Example
-</button>
-<div id="example" style="display:none;">
-<table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-<tr><th colspan="2" style="background:#eee; padding: 10px;">Participants</th></tr>
-<tr><td style="width:30%; font-weight:bold;">Anna</td><td>Coach</td></tr>
-<tr><td style="font-weight:bold;">Lukas</td><td>Coachee</td></tr>
-<tr><th colspan="2" style="background:#eee; padding: 10px;">Context</th></tr>
-<tr><td colspan="2">Lukas is stuck at work — unsure whether to pursue a promotion or switch careers.</td></tr>
-<tr><th colspan="2" style="background:#eee; padding: 10px;">Conversation Flow</th></tr>
-<tr><td colspan="2"><strong>⚪️ Goal</strong><br/>
-Anna: “What would you like to achieve in the next month?”<br/>
-Lukas: “Clarity about going for a promotion or looking elsewhere.”<br/>
-Anna: “Is this more about figuring out if you still belong at this company?”<br/>
-Lukas: “Yeah… I like the team but not the direction.”</td></tr>
-<tr><td colspan="2"><strong>🟢 Support</strong><br/>
-Anna: “What personal strength has helped you in the past?”<br/>
-Lukas: “Adaptability — I’ve shifted roles before and always landed on my feet.”</td></tr>
-<tr><td colspan="2"><strong>🔵 Exploration</strong><br/>
-Anna: “What have you tried so far?”<br/>
-Lukas: “Updated resume, informal chats... but I keep hesitating.”<br/>
-Anna: “What’s behind the hesitation?”<br/>
-Lukas: “Fear of making the wrong move again.”</td></tr>
-<tr><td colspan="2"><strong>🔴 Challenge</strong><br/>
-Anna: “What negative self-talk do you need to challenge?”<br/>
-Lukas: “That I won’t succeed elsewhere.”<br/>
-Anna: “And how true does that feel?”<br/>
-Lukas: “Less than before. I’ve made bigger leaps.”</td></tr>
-<tr><td colspan="2"><strong>🟡 Creativity</strong><br/>
-Anna: “If this were a story, what twist would you add?”<br/>
-Lukas: “I’d travel and discover a new career path by accident.”</td></tr>
-<tr><td colspan="2"><strong>🟠 Action</strong><br/>
-Anna: “What’s one specific step you can take this week?”<br/>
-Lukas: “Reach out to that recruiter I’ve been avoiding.”<br/>
-Anna: “Great. I’ll check in next week.”</td></tr>
-<tr><th colspan="2" style="background:#eee; padding: 10px;">Closing</th></tr>
-<tr><td colspan="2">Coach: “Looking back — what surprised you most? What do you want to carry forward?”</td></tr>
-</table>
-</div></div>
-<button class="toggle-instructions" onclick="toggleInstructions()">?</button>
-<div style="text-align:right;">
-<button onclick="document.getElementById('instructions').style.display = (document.getElementById('instructions').style.display === 'none') ? 'block' : 'none';" style="position: fixed; bottom: 20px; right: 20px; background-color: #2C5F2D; color: white; font-size: 28px; border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer;">
-    ?
-  </button>
+
+<div id="game-screen" class="screen">
+    <div class="game-controls-top">
+        <span class="control-icon" onclick="restartGame()">🔄</span>
+        <span class="control-icon" onclick="toggleInstructions(true)">ℹ️</span>
+    </div>
+    <div id="card-container"></div>
+    <div class="game-controls-bottom">
+         <button id="back-btn" class="nav-arrow left" onclick="goBack()"></button>
+        <button id="complete-btn">Complete</button>
+        <button id="next-btn" class="nav-arrow right" onclick="goNext()"></button>
+    </div>
+    <div class="game-controls-top">
+    <span class="control-icon" onclick="restartGame()">🔄</span>
+    <span class="control-icon" onclick="toggleInstructions(true)">ℹ️</span>
+    <span class="control-icon" onclick="toggleControls(true)">⚙️</span> </div>
 </div>
-<div id="instructions" style="display: none; text-align: left; margin-top: 20px; background: white; padding: 20px; border-radius: 12px;">
-<h2>How to Play</h2>
-<p><strong>Mind Trails</strong> is a coaching card game played in pairs. One is the Seeker (who brings a challenge), and one is the Guide (who helps explore it).</p>
-<ol>
-<li><strong>Goal</strong>: Start with a question to define the challenge.</li>
-<li><strong>Draw</strong>: Receive one card per phase and discuss together.</li>
-<li><strong>Continue to Next Phase</strong>: When ready, move forward through all 6 phases.</li>
-</ol>
-<button onclick="const ex=document.getElementById('example'); ex.style.display=(ex.style.display==='none')?'block':'none'; this.innerText=this.innerText==='See Example'?'Hide Example':'See Example';" style="margin: 10px 0; padding: 6px 16px; font-size: 16px; border: none; border-radius: 6px; background-color: #555; color: white;">
-    See Example
-  </button>
-<div id="example" style="display:none;">
-<pre style="white-space: pre-wrap; font-size: 14px;">
-Participants:
-  Anna (Coach)
-  Lukas (Coachee)
 
-Context:
-  Lukas is feeling stuck at work — unsure whether to pursue a promotion or switch to a different career path.
+<div id="word-cloud-modal"><div id="word-cloud-content"></div></div>
+<div class="instructions" id="instructions">
+    <h2>Welcome to Mind Trails</h2>
+    <p>This is a card-based reflection game played in pairs. One person is the <strong>Seeker</strong>, and the other is the <strong>Guide</strong>.</p>
+    <p>The Seeker chooses a challenge or goal. Together, you will walk through <strong>6 card stages</strong> — each helping the Seeker explore, reframe, and move forward.</p>
+    <h3>How It Works:</h3>
+    <ol>
+        <li>Start with <strong>"Goal"</strong> cards to define a challenge.</li>
+        <li>Read the question aloud and reflect together.</li>
+        <li>When you're ready, continue to the next category.</li>
+    </ol>
+    <button onclick="const ex=document.getElementById('example'); ex.style.display=(ex.style.display==='none')?'block':'none'; this.innerText=(this.innerText==='Show Example'?'Hide Example':'Show Example');">Show Example</button>
+    <div id="example" style="display:none;">
+        <table>
+            <tr><th colspan="2">Participants</th></tr>
+            <tr><td>Anna</td><td>Coach</td></tr>
+            <tr><td>Lukas</td><td>Coachee</td></tr>
+            <tr><th colspan="2">Context</th></tr>
+            <tr><td colspan="2">Lukas is stuck at work — unsure whether to pursue a promotion or switch careers.</td></tr>
+            <tr><th colspan="2">Conversation Flow</th></tr>
+            <tr><td><strong><span class="category-indicator goal"></span>Goal (Change)</strong><br/>Anna: “If you could change one thing about your life right now, what would it be?”<br/>Lukas: “To stop feeling stuck and be excited about my work again, whether it's here or somewhere new.”</td></tr>
+            <tr><td><strong><span class="category-indicator support"></span>Support (Overcome)</strong><br/>Anna: “Recall a difficult situation you successfully navigated. What skills did you use then?”<br/>Lukas: “Moving to a new city for college. I had to be brave and take a leap of faith, even though I was scared.”</td></tr>
+            <tr><td><strong><span class="category-indicator exploration"></span>Exploration (Motivation)</strong><br/>Anna: “Deep down, why is achieving this goal important to you right now?”<br/>Lukas: “It’s about my personal growth. I feel like I’m coasting, and I want to feel challenged again.”</td></tr>
+            <tr><td><strong><span class="category-indicator challenge"></span>Challenge (Fear)</strong><br/>Anna: “What fear holds you back from making progress?”<br/>Lukas: “The fear of the unknown, and of disappointing my current boss if I explore other options.”</td></tr>
+            <tr><td><strong><span class="category-indicator creativity"></span>Creativity (No-Fear)</strong><br/>Anna: “If you knew you could not fail, what new or brave step would you take?”<br/>Lukas: “I’d ask for a 3-month sabbatical to explore a passion project without having to quit my job entirely.”</td></tr>
+            <tr><td><strong><span class="category-indicator action"></span>Action (First-Step)</strong><br/>Anna: “What is one clear step you can take this week?”<br/>Lukas: “I’ll draft a proposal for that sabbatical project. It feels less scary than just quitting.”</td></tr>
+            <tr><th colspan="2">Closing</th></tr>
+            <tr><td colspan="2">Anna: “Looking back — what surprised you most? What do you want to carry forward?”</td></tr>
+        </table>
+    </div>
+    <button onclick="toggleInstructions(false)">Close</button>
 
-🟠 START SCREEN (Instructions for Both)
-Coach reads aloud:
-  “Let’s go through six steps to explore your challenge. Each step has a few cards.
-You’ll reflect on one question per phase. Let’s begin.”
-
-⚪️ STEP 1 – Goal (White)
-Anna: “Here’s the first question: What would you like to achieve in the next month?”
-Lukas: “I’d like clarity about whether to go for this internal promotion or look elsewhere.”
-Anna: “Okay, so you want more clarity. Is this more about figuring out if you still belong in this company?”
-Lukas: “Yeah… I feel torn. I like the team but not the direction.”
-
-🟢 STEP 2 – Support (Green)
-Anna: “What personal strength has helped you in the past?”
-Lukas: “Hm... Probably adaptability. I’ve shifted roles before and always landed on my feet.”
-Anna: “That’s big. Can you think of a time that reminds you of now?”
-Lukas: “Yeah — when I left sales to go into product design.”
-
-🔵 STEP 3 – Exploration (Blue)
-Anna: “What have you tried so far to reach your goals?”
-Lukas: “I’ve updated my resume and had a few informal conversations... but I keep hesitating.”
-Anna: “What’s behind the hesitation?”
-Lukas: “I think it’s fear — of making the wrong move again.”
-
-🔴 STEP 4 – Challenge (Red)
-Anna: “What negative self-talk do you need to challenge?”
-Lukas: “Probably that ‘I won’t succeed elsewhere.’ That’s a huge one for me.”
-Anna: “And how true does that feel, really?”
-Lukas: “Less true than it used to. I’ve made bigger jumps before.”
-
-🟡 STEP 5 – Creativity (Yellow)
-Anna: “If this situation were a story you’re writing, what surprising twist would you add to make it inspiring and fun?”
-Lukas: (laughs) “Maybe I’d take a sabbatical to travel — and end up discovering a new field by accident.”
-Anna: “That’s beautiful. It tells me you’re craving something more expansive.”
-
-🟠 STEP 6 – Action (Orange)
-Anna: “What’s one specific step you can take this week to move closer to your goal?”
-Lukas: “I’ll set up a meeting with that recruiter I’ve been putting off. Just to talk.”
-Anna: “Perfect. And I’ll follow up with you next week. Sound good?”
-Lukas: “Yeah. Thanks — this really helped untangle things.”
-
-🌀 End of Trail
-Coach: “Looking back — what surprised you most? What do you want to carry forward?”
-    </pre>
+</div> <div class="instructions" id="controls-modal"> <h2>Controls ⚙️</h2>
+    <ul>
+        <li><strong>Flip Card:</strong> Click on any card to flip it over and see the question.</li>
+        <li><strong>See All Words:</strong> Click and hold on any card to see all the clarifying words for that category.</li>
+        <li><strong>Navigate Categories:</strong> Use the ⬅️ and ➡️ arrows at the bottom of the screen.</li>
+        <li><strong>Complete Category:</strong> Click the "Complete" button to unlock the next category. The game will remember your progress.</li>
+        <li><strong>Restart Game:</strong> Click the 🔄 icon at the top-left to start over.</li>
+    </ul>
+    <button onclick="toggleControls(false)">Close</button>
 </div>
-</div>
+
 <script>
-    const questions = {
-  "Goal": [
-    "What's one area of your life you'd like to improve?",
-    "What's a challenge you're facing right now?",
-    "What would you like to achieve in the next month?",
-    "If you could change one thing about your current situation, what would it be?",
-    "What skill would you most like to develop?",
-    "What new skill or habit would make the biggest difference for you?",
-    "What small achievement would feel like a big victory for you right now?",
-    "Imagine your future self sending you a postcard. What accomplishment would they be celebrating?",
-    "What is one brave first step you can imagine taking?",
-    "What are you willing to leave behind in order to move forward?"
-  ],
-  "Support": [
-    "What’s a recent accomplishment you’re proud of?",
-    "Who are your “roots” - people or beliefs that keep you going?",
-    "What personal strength has helped you in the past?",
-    "When do you feel most confident?",
-    "What’s something you’ve overcome that you didn’t think you could?",
-    "When and how have you turned a difficult situation into something positive?",
-    "What gives you energy when you feel tired or discouraged?",
-    "How does the way you support others reveal your own inner resources?",
-    "What reminds you that you’re capable, even on hard days?",
-    "Think of a time when you felt unstoppable. What were you doing?"
-  ],
-  "Exploration": [
-    "How do you usually respond when faced with rejection?",
-    "What would success look like for you in the next few months?",
-    "What’s something you haven’t tried yet but are curious about?",
-    "How does your current situation affect your daily life?",
-    "What have you tried so far to reach your goals?",
-    "What motivates you to make a change?",
-    "When do you feel most confident in your abilities?",
-    "What part do you usually play when working in a group?",
-    "What is the biggest obstacle standing between you and your ideal outcomes?",
-    "How would achieving your goal impact other areas of your life?"
-  ],
-  "Challenge": [
-    "What's holding you back from taking the next step?",
-    "What negative self-talk do you need to challenge?",
-    "What responsibility do you need to take for your current situation?",
-    "What makes rejection feel so tough?",
-    "What makes you doubt you are good enough for certain roles?",
-    "What is unclear for you about the things you want?",
-    "When have you felt like your efforts wouldn’t pay off?",
-    "Whose external factors are influencing your choices?",
-    "Who supports you — and who should be supporting you?",
-    "What holds you back from making a change?"
-  ],
-  "Creativity": [
-    "If you could wave a magic wand to transform this challenge, what would the solution look like, and how would it change things for you?",
-    "What would someone you admire—real or fictional—do to tackle this situation in a totally unexpected way?",
-    "If your future self could send you a message about this challenge, what bold, creative idea would they suggest trying?",
-    "How could you flip this challenge into an exciting opportunity, like turning a problem into a chance to shine?",
-    "If this situation were a story you’re writing, what surprising twist would you add to make it inspiring and fun?",
-    "What’s a wild, out-of-the-box idea you haven’t considered yet that could shake things up?",
-    "Imagine you’re a superhero facing this challenge. What unique power would you use, and how would you save the day?",
-    "If you could solve this problem in any way, no limits, what crazy or cool solution would you dream up?",
-    "What would you try if you knew you couldn’t fail, and how would it feel to make it happen?",
-    "If this challenge were a puzzle, what completely new way could you rearrange the pieces to solve it?"
-  ],
-  "Action": [
-    "What’s one specific step you can take this week to move closer to your goal?",
-    "What’s one small thing you can do tomorrow that feels exciting or doable for you?",
-    "Who could you reach out to for support or encouragement to help you take this step?",
-    "How will you remind yourself to follow through on your next step, like a note or a phone alert?",
-    "What obstacle might pop up, and what’s one way you could handle it to stay on track?",
-    "How will you celebrate or reward yourself when you complete this action, big or small?",
-    "What new habit or routine could you start to support your goal, even if it’s super simple?",
-    "What’s one resource—like a person, book, or website—you could explore to help you move forward?",
-    "What skill or action will you practice this week to build confidence in your plan?",
-    "What’s one thing you’ll do differently this week to make progress, and when will you start?"
-  ]
-};
-
+    const questions = { "Goal": [{ word: "Focus", text: "What is one part of your life you want to make better?" },{ word: "Challenge", text: "What is a challenge you have right now?" },{ word: "Future", text: "What would you like to do in the next month?" },{ word: "Change", text: "If you could change one thing about your life right now, what would it be?" },{ word: "Skill", text: "What skill would you like to learn the most?" },{ word: "Habit", text: "What new habit would help you the most?" },{ word: "Win", text: "What small thing could you do that would feel like a big win for you right now?" },{ word: "Vision", text: "Imagine your future self sends you a message. What success are they celebrating?" },{ word: "First-Step", text: "What is one brave first step you can think of taking?" },{ word: "Release", text: "What could you stop doing to help you move forward?" }], "Support": [{ word: "Pride", text: "What is something you did recently that makes you feel proud?" },{ word: "Support", text: "What strengths, people, or ideas give you support for your goal of \"[goal]\"?" },{ word: "Strength", text: "Thinking about your goal of \"[goal]\", which of your personal strengths gives you the most confidence?" },{ word: "Confidence", text: "When do you feel most strong and sure of yourself?" },{ word: "Overcome", text: "Recall a difficult situation you successfully navigated. What skills did you use then that you can apply to your current goal of \"[goal]\"?" },{ word: "Growth", text: "What is the most valuable lesson a past challenge has taught you?" },{ word: "Energy", text: "What gives you energy when you feel tired or down about your goal of \"[goal]\"?" },{ word: "Qualities", text: "What good qualities do you have that you can bring to your goal of \"[goal]\"?" },{ word: "Reminder", text: "What reminds you that you can succeed with your goal of \"[goal]\", even on hard days?" },{ word: "Power", text: "Think of a time you felt you could do anything. What were you doing?" }], "Exploration": [{ word: "Reaction", text: "How do you usually act when things don't go the way you want to?" },{ word: "Success", text: "What does \"doing well\" with your goal of \"[goal]\" look like for you in the next few months?" },{ word: "Curiosity", text: "What is a new approach you are interested in trying for your goal of \"[goal]\"?" },{ word: "Impact", text: "How does your goal of \"[goal]\" affect your daily life?" },{ word: "History", text: "What have you already tried regarding your goal of \"[goal]\"?" },{ word: "Motivation", text: "Deep down, why is achieving this goal of \"[goal]\" important to you right now?" },{ word: "Abilities", text: "When it comes to your goal of \"[goal]\", what do you feel most capable of doing?" },{ word: "Role", text: "Are you actively creating the opportunities to achieve your goal of \"[goal]\", or are you waiting for them to appear?" },{ word: "Obstacle", text: "What is the biggest thing stopping you from getting the result you want with your goal of \"[goal]\"?" },{ word: "Effect", text: "If you make progress on your goal of \"[goal]\", how will it change other parts of your life?" }], "Challenge": [{ word: "Block", text: "What is holding you back from taking the next step with your goal of \"[goal]\"?" },{ word: "Self-Doubt", text: "What negative things do you tell yourself about your goal of \"[goal]\" that you should question?" },{ word: "Control", text: "What falls completely within your circle of control regarding this goal of \"[goal]\"?" },{ word: "Story", text: "When things go wrong, what story do you tell yourself about that failure?" },{ word: "Doubt", text: "Is there anything that makes you doubt that you are good enough to achieve your goal of \"[goal]\"?" },{ word: "Clarity", text: "What is not clear to you about your goal of \"[goal]\"?" },{ word: "Lesson", text: "Think of a time you failed at something similar to your goal of \"[goal]\". What did you learn from it?" },{ word: "Influence", text: "What people or things around you are influencing your goal of \"[goal]\"?" },{ word: "Help", text: "What challenging conversation do you need to have to get the support you truly need?" },{ word: "Fear", text: "What fear holds you back from making progress on your goal of \"[goal]\"?" }], "Creativity": [{ word: "Magic", text: "If you had a magic wand for your goal of \"[goal]\", what would you make happen?" },{ word: "Role-Model", text: "How would a person you look up to handle your goal of \"[goal]\"?" },{ word: "Future-Self", text: "Your successful future self knows you can do this. What brave step would they encourage you to take right now?" },{ word: "Adventure", text: "How can you turn your goal of \"[goal]\" into an exciting adventure?" },{ word: "Story", text: "If your goal of \"[goal]\" was a story you are writing, what surprise would you add to the story?" },{ word: "Wild-Idea", text: "If you had to break all the rules to achieve your goal of \"[goal]\", what would you do?" },{ word: "Superhero", text: "Imagine you are a superhero trying to achieve your goal of \"[goal]\". What special power would you use?" },{ word: "No-Limits", text: "If there were no rules for achieving your goal of \"[goal]\", what cool or fun solution can you think of?" },{ word: "No-Fear", text: "If you knew you could not fail at your goal of \"[goal]\", what new or brave step would you take?" },{ word: "Puzzle", text: "If your goal of \"[goal]\" was a puzzle, how could you move the pieces around differently?" }], "Action": [{ word: "First-Step", text: "What is one clear step you can take this week to move toward your goal of \"[goal]\"?" },{ word: "Tomorrow", text: "What is one small thing you can do tomorrow to make progress on your goal of \"[goal]\"?" },{ word: "Support", text: "Who can you ask for help or support with your goal of \"[goal]\"?" },{ word: "Reminder", text: "How can you remind yourself to do what you planned for your goal of \"[goal]\"?" },{ word: "Plan-B", text: "What problem might come up on the way to your goal of \"[goal]\", and how could you deal with it?" },{ word: "Celebrate", text: "How will you celebrate when you complete a step toward your goal of \"[goal]\"?" },{ word: "Habit", text: "What new habit could you start to help you with your goal of \"[goal]\"?" },{ word: "Resource", text: "What is one resource (like a person, book, or website) you could look at to help you with your goal of \"[goal]\"?" },{ word: "Practice", text: "What skill or action will you practice this week to feel more sure about your goal of \"[goal]\"?" },{ word: "Different", text: "What is one different thing you can do this week to move forward?" }] };
+    const categoryDetails = { "Goal": { name: "Goal Setting", icon: "images/goal_setting.png", color: "#4abd93", textColor: "#FFFFFF" }, "Support": { name: "Support", icon: "images/support.png", color: "#2e7040", textColor: "#FFFFFF" }, "Exploration": { name: "Exploration", icon: "images/exploration.png", color: "#4365b0", textColor: "#FFFFFF" }, "Challenge": { name: "Challenge", icon: "images/challenge.png", color: "#cd2727", textColor: "#FFFFFF" }, "Creativity": { name: "Creativity", icon: "images/creativity.png", color: "#f8b019", textColor: "#FFFFFF" }, "Action": { name: "Action Planning", icon: "images/action_planning.png", color: "#f26622", textColor: "#FFFFFF" } };
+    
     const categoryOrder = ["Goal", "Support", "Exploration", "Challenge", "Creativity", "Action"];
     let currentCategoryIndex = 0;
-    let currentCategory = categoryOrder[currentCategoryIndex];
-    let history = [];
-    let shownIndices = { Goal: [], Support: [], Exploration: [], Challenge: [], Creativity: [], Action: [] };
+    let userGoal = "";
+    let holdTimer;
+    let completedCategories = new Set ();
 
-    function updateCategoryButtons() {
-      categoryOrder.forEach((cat, idx) => {
-        const btn = document.getElementById(cat);
-        if (idx < currentCategoryIndex) {
-          btn.classList.add("unlocked");
-          btn.onclick = () => switchCategory(cat);
-        } else if (idx === currentCategoryIndex) {
-          btn.classList.add("active");
-          btn.classList.remove("unlocked");
-        } else {
-          btn.classList.remove("unlocked", "active");
-          btn.onclick = null;
+    function showScreen(screenId) {
+        toggleInstructions(false);
+        toggleControls(false);
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.style.display = 'none';
+        });
+        document.getElementById(screenId).style.display = 'flex';
+    }
+
+    function startGame() {
+        userGoal = document.getElementById('goal-input').value.trim();
+        if (userGoal === "") {
+            alert("Please enter your goal.");
+            return;
         }
-      });
+        showScreen('game-screen');
+        switchCategory(categoryOrder[currentCategoryIndex]);
     }
-
-    function switchCategory(cat) {
-      currentCategory = cat;
-      currentCategoryIndex = categoryOrder.indexOf(cat);
-      updateCategoryButtons();
-      document.getElementById("question-card").style.backgroundColor = document.getElementById(cat).style.backgroundColor;
-      
-document.getElementById("question-card").innerText = "Click Draw to begin.";
-let bg = document.getElementById(currentCategory).style.backgroundColor;
-document.getElementById("question-card").style.backgroundColor = bg;
-document.getElementById("question-card").style.color = (currentCategory === "Goal") ? "#000000" : "#ffffff";
-        
-    }
-
-    function drawCard() {
-      const options = questions[currentCategory];
-      const used = shownIndices[currentCategory];
-      const remaining = options.filter((_, idx) => !used.includes(idx));
-      if (remaining.length === 0) return;
-      const idx = options.indexOf(remaining[0]);
-      shownIndices[currentCategory].push(idx);
-      history.push({ category: currentCategory, question: options[idx] });
-      document.getElementById("question-card").style.backgroundColor = document.getElementById(currentCategory).style.backgroundColor;
-      
-document.getElementById("question-card").innerText = options[idx];
-let bg = document.getElementById(currentCategory).style.backgroundColor;
-document.getElementById("question-card").style.backgroundColor = bg;
-document.getElementById("question-card").style.color = (currentCategory === "Goal") ? "#000000" : "#ffffff";
-        
-
-    let cardTextColor = (currentCategory === "Goal") ? "#000000" : "#ffffff";
-    document.getElementById("question-card").style.color = cardTextColor;
     
+    function switchCategory(categoryName) {
+        generateCardsForCategory(categoryName);
+    }
+    
+    function generateCardsForCategory(categoryName) {
+        const container = document.getElementById('card-container');
+        container.innerHTML = '';
+        const categoryQuestions = questions[categoryName];
+        const details = categoryDetails[categoryName];
+        
+        categoryQuestions.forEach((q, index) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.index = index;
+
+            const front = document.createElement('div');
+            front.className = 'card-face card-front';
+            front.style.backgroundColor = details.color;
+            front.style.color = details.textColor;
+            front.innerHTML = `
+                <div class="category-title">${details.name.toUpperCase()}</div>
+            <div class="icon-container">
+                <img src="${details.icon}" alt="${details.name} icon" class="card-icon">
+            </div>
+                <div class="clarifying-word">${q.word}</div>
+            `;
+            
+            const back = document.createElement('div');
+            back.className = 'card-face card-back';
+            back.textContent = formatQuestion(q.text, userGoal);
+
+            card.appendChild(front);
+            card.appendChild(back);
+            container.appendChild(card);
+            
+            card.addEventListener('mousedown', () => { holdTimer = setTimeout(() => showWordCloud(categoryName), 800); });
+            card.addEventListener('touchstart', () => { holdTimer = setTimeout(() => showWordCloud(categoryName), 800); });
+            const clearHoldTimer = () => clearTimeout(holdTimer);
+            card.addEventListener('mouseup', clearHoldTimer);
+            card.addEventListener('mouseleave', clearHoldTimer);
+            card.addEventListener('touchend', clearHoldTimer);
+
+            card.addEventListener('click', () => {
+                if (!card.classList.contains('flipped-by-cloud')) card.classList.toggle('flipped');
+                card.classList.remove('flipped-by-cloud');
+            });
+        });
+        resetControls();
+    }
+    
+    function showWordCloud(categoryName) {
+        const modal = document.getElementById('word-cloud-modal');
+        const content = document.getElementById('word-cloud-content');
+        content.innerHTML = '';
+        const details = categoryDetails[categoryName];
+        
+        questions[categoryName].forEach((q, index) => {
+            const wordItem = document.createElement('div');
+            wordItem.className = 'word-cloud-item';
+            wordItem.textContent = q.word;
+            wordItem.onclick = () => {
+                wordItem.style.backgroundColor = details.color;
+                wordItem.style.color = details.textColor;
+                wordItem.style.borderColor = details.color;
+                const cardToFlip = document.querySelector(`.card[data-index='${index}']`);
+                if (cardToFlip) {
+                    if (!cardToFlip.classList.contains('flipped')) {
+                        cardToFlip.classList.add('flipped', 'flipped-by-cloud');
+                    }
+                    setTimeout(() => {
+                        cardToFlip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                        modal.style.display = 'none';
+                    }, 200);
+                } else {
+                    modal.style.display = 'none';
+                }
+            };
+            content.appendChild(wordItem);
+        });
+        
+        modal.style.display = 'flex';
+        modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
     }
 
     function goBack() {
-      for (let i = history.length - 2; i >= 0; i--) {
-        if (history[i].category === currentCategory) {
-          history.pop();
-          const prev = history[history.length - 1];
-          document.getElementById("question-card").style.backgroundColor = document.getElementById(prev.category).style.backgroundColor;
-          document.getElementById("question-card").innerText = prev.question;
-          return;
+        if (currentCategoryIndex > 0) {
+            currentCategoryIndex--;
+            switchCategory(categoryOrder[currentCategoryIndex]);
         }
-      }
     }
 
-    function nextPhase() {
-      if (currentCategoryIndex < categoryOrder.length - 1) {
-        currentCategoryIndex++;
-        currentCategory = categoryOrder[currentCategoryIndex];
-        updateCategoryButtons();
-        document.getElementById("question-card").style.backgroundColor = document.getElementById(currentCategory).style.backgroundColor;
-        
-document.getElementById("question-card").innerText = "Click Draw to begin.";
-let bg = document.getElementById(currentCategory).style.backgroundColor;
-document.getElementById("question-card").style.backgroundColor = bg;
-document.getElementById("question-card").style.color = (currentCategory === "Goal") ? "#000000" : "#ffffff";
-        
-      }
+    function goNext() {
+         // This check now acts as a guard at the top of the function
+        const nextBtn = document.getElementById('next-btn');
+        if (nextBtn.classList.contains('disabled')) {
+            return; // Immediately stops the function if disabled
+        }
+ 
+        if (currentCategoryIndex < categoryOrder.length - 1) {
+            currentCategoryIndex++;
+            switchCategory(categoryOrder[currentCategoryIndex]);
+        } else {
+            alert("This is the last category.");
+        }
+    
+    }
+    
+        // ADD THIS ENTIRE NEW FUNCTION
+    function resetControls() {
+        const nextBtn = document.getElementById('next-btn');
+        const completeBtn = document.getElementById('complete-btn');
+        const backBtn = document.getElementById('back-btn');
+
+            // Disable the next arrow
+        if (nextBtn && completeBtn) {
+            const currentCategory = categoryOrder[currentCategoryIndex];
+
+            // CHECK if the category is already in our tracker
+            if (completedCategories.has(currentCategory)) {
+                // If yes, set the controls to the "completed" state
+                completeBtn.textContent = 'Completed ✓';
+                completeBtn.classList.add('completed');
+                completeBtn.disabled = true;
+                nextBtn.classList.remove('disabled');
+            } else {
+                // If no, set the controls to the initial "uncompleted" state
+                nextBtn.classList.add('disabled');
+                completeBtn.classList.remove('completed');
+                completeBtn.textContent = 'Complete';
+                completeBtn.disabled = false;
+            }
+        }
+
+      if (backBtn) {
+        if (currentCategoryIndex === 0) {
+            backBtn.style.visibility = 'hidden'; // Hide on the first category
+        } else {
+            backBtn.style.visibility = 'visible'; // Show on other categories
+            // Get the previous category's color
+            const prevCategoryName = categoryOrder[currentCategoryIndex - 1];
+            backBtn.style.backgroundColor = categoryDetails[prevCategoryName].color;
+        }
     }
 
-    function toggleInstructions() {
+        // --- Next Arrow Color ---
+        if (nextBtn) {
+            // Check if there is a next category
+            if (currentCategoryIndex < categoryOrder.length - 1) {
+                const nextCategoryName = categoryOrder[currentCategoryIndex + 1];
+                // Apply color if not disabled, otherwise use default
+                if (!nextBtn.classList.contains('disabled')) {
+                    nextBtn.style.backgroundColor = categoryDetails[nextCategoryName].color;
+                } else {
+                    nextBtn.style.backgroundColor = ''; // Revert to default CSS color
+                }
+            } else {
+                // No next category, so make sure it's disabled and default color
+                nextBtn.classList.add('disabled');
+                nextBtn.style.backgroundColor = '';
+            }
+        }
+    }
+    
+
+    function formatQuestion(text, goal) {
+        return text.replace(/\[goal\]/g, goal);
+    }
+
+    function restartGame() {
+        if (confirm("Are you sure? This will restart your progress and return you to the main menu.")) {
+            currentCategoryIndex = 0;
+            userGoal = "";
+            document.getElementById('goal-input').value = "";
+            completedCategories.clear();
+            showScreen('start-screen');
+        }
+    }
+
+    function toggleInstructions(shouldShow) {
       const el = document.getElementById("instructions");
-      el.style.display = el.style.display === "none" ? "block" : "none";
+      el.style.display = shouldShow ? "block" : "none";
     }
 
-    function toggleExample() {
-      const ex = document.getElementById("example");
-      ex.style.display = ex.style.display === "none" ? "block" : "none";
+    function toggleControls(shouldShow) {
+      const el = document.getElementById("controls-modal");
+      el.style.display = shouldShow ? "block" : "none";
     }
 
-    switchCategory(currentCategory);
-    updateCategoryButtons();
-  
+    document.addEventListener('DOMContentLoaded', () => {
+        showScreen('start-screen');
 
-function sendFeedback(tag) {
-  const category = currentCategory;
-  const question = document.getElementById("question-card").innerText;
-  const baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSe_RADk1KIJbIBIJClrL3Mv8ZzzxTAWjx_-6GqVA9jmHP6BzA/viewform";
-  const params = new URLSearchParams();
-  params.append("entry.250526545", category);
-  params.append("entry.946746809", question);
-  params.append("entry.1474705841", tag);
-  window.open(`${baseUrl}?usp=pp_url&${params.toString()}`, "_blank");
-}
+        const completeBtn = document.getElementById('complete-btn');
+        
+
+        completeBtn.addEventListener('click', () => {
+
+            const nextBtn = document.getElementById('next-btn');
+
+            // Change button to "completed" state
+            completeBtn.textContent = 'Completed ✓';
+            completeBtn.classList.add('completed');
+            completeBtn.disabled = true;
+            nextBtn.classList.remove('disabled');
+
+            if (currentCategoryIndex < categoryOrder.length - 1) {
+                const nextCategoryName = categoryOrder[currentCategoryIndex + 1];
+                nextBtn.style.backgroundColor = categoryDetails[nextCategoryName].color;
+            }
+
+            completedCategories.add(categoryOrder[currentCategoryIndex]);
+        });
+    });
 </script>
 </body>
 </html>
