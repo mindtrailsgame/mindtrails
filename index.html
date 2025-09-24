@@ -8,33 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-@media (max-width: 600px) {
-    #card-container {
-        scroll-snap-type: x mandatory;
-        display: flex;
-        align-items: center;
-    }
-
-    .card {
-        flex-basis: 85%;
-        aspect-ratio: 2 / 3; /* Maintains a consistent card shape */
-        min-height: 300px;   /* Prevents it from getting too small */
-        max-height: 420px;   /* Prevents it from getting too tall on narrow screens */
-        
-        scroll-snap-align: center;
-    }
-
-    /* Bottom controls styling remains the same */
-    .game-controls-bottom {
-        gap: 15px;
-        padding: 8px 15px;
-    }
-    #complete-btn {
-        padding: 8px 20px;
-        font-size: 16px;
-    }
-}
-
     /* General Styles */
     body {
       font-family: 'Josefin Sans', sans-serif;
@@ -59,14 +32,21 @@
         position: relative;
         display: flex;
         flex-direction: column;
+        padding: 20px 0; /* Add some vertical padding */
+        box-sizing: border-box; /* Ensures padding is included in height */
         justify-content: center;
     }
 
     /* 1. START SCREEN (MENU) */
 
+    #start-screen {
+    height: 70vh;
+    }
+
     #game-logo-img {
         width: 300px; /* Adjust this value to make the logo bigger or smaller */
         height: auto; /* This keeps the image's proportions correct */
+        padding: 20px;
     }
 
     .menu-buttons {
@@ -99,15 +79,24 @@
     }
 
     /* 3. GAME SCREEN */
+
     .game-controls-top {
-        position: absolute; top: 20px; left: 20px; display: flex;
-        gap: 10px; z-index: 100;
+
+        display: flex;
+        gap: 10px; 
+        z-index: 100;
+        padding-left: 20px;
+        margin-bottom: 30px;
     }
     .game-controls-bottom {
-        position: absolute; bottom: 20px; left: 50%;
-        transform: translateX(-50%); display: flex; gap: 20px; z-index: 100;
-        background-color: rgba(255, 255, 255, 0.9); padding: 10px 20px;
-        border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        display: flex;
+        gap: 20px;
+        z-index: 100;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 10px 20px;
+        border-radius: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        margin: 0 auto; /* This will now center the element horizontally */
     }
     .control-icon {
         font-size: 28px; cursor: pointer; width: 45px; height: 45px;
@@ -186,38 +175,91 @@
     }
     .control-icon:hover { background-color: #e0e0e0; }
 
+    #card-area-wrapper {
+        width: 100%;
+        /* Suteikiame šiek tiek vertikalios erdvės pačiam konteineriui */
+        padding: 0px 0;
+        /* Perspektyva dabar yra čia, kad transformacija atrodytų gerai */
+        perspective: 1200px;
+    }
+
+    
     #card-container {
-        padding: 20px; margin: auto 0; display: flex; gap: 20px;
-        overflow-x: auto; perspective: 1000px; -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
+        width: 100%;
+        min-height: 0; /* Important for flexbox behavior */
+        flex-grow: 1;  /* Allows this area to fill vertical space */
+
+        /* It aligns its direct child (the scroller) in the center. */
+        display: flex;
+        align-items: center; 
+    }
+
+    /* This new element handles ALL scrolling and card layout. */
+    .card-scroller {
+        width: 100%;
+        display: flex;
+        align-items: center; /* This keeps cards vertically centered inside the scrollbar */
+        gap: 20px;
+        overflow-x: auto;
+        padding: 20px 40px; /* Provides vertical AND horizontal space for animation */
+
+        /* All the scrollbar hiding styles now apply to the scroller */
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;     /* Firefox */
+    }
+    .card-scroller::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, etc. */
+    }
+    
+    /* Paslepiame slankjuostę Chrome, Safari ir Opera */
+    #card-container::-webkit-scrollbar {
+        display: none;
     }
     .card {
-        flex: 0 0 220px; height: 320px; position: relative; cursor: pointer;
+        flex: 0 0 220px; height: 350px; position: relative; cursor: pointer;
         transform-style: preserve-3d; transition: transform 0.6s;
     }
     .card.flipped { transform: rotateY(180deg); }
     
     /* This rule is crucial - it stacks the front and back faces */
+    /* ---- REPLACE ALL YOUR OLD CARD STYLES WITH THIS BLOCK ---- */
+
+    /* This rule sets up the basic card face without any padding */
     .card-face {
         position: absolute;
-        width: 100%; height: 100%;
+        width: 100%; 
+        height: 100%;
         backface-visibility: hidden;
         border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        box-sizing: border-box;
+        /* The key change: NO PADDING HERE */
+        padding: 0; 
+    }
+
+    /* This rule handles the unique layout and padding for the card's front */
+    .card-face.card-front {
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 20px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        box-sizing: border-box;
+        padding: 25px 0;
     }
 
-  
-    .card-front {
+    /* This rule handles the unique layout and padding for the card's back */
+    .card-face.card-back {
         display: flex;
         flex-direction: column;
-
-        padding: 20px 0;
+        align-items: center;
+        justify-content: center;
+        transform: rotateY(180deg);
+        font-size: 19px;
+        font-weight: 400;
+        background-color: #FFFFFF;
+        color: #000000;
+        padding: 20px;
     }
+
+    /* These are the styles for the content INSIDE the card front */
     .card-front .category-title {
         font-size: 20px; 
         font-weight: 700;
@@ -230,29 +272,24 @@
         align-items: center;
         justify-content: center;
         min-height: 0;
+        width: 100%;
     }
-  
+    
     .card-front .card-icon {
         width: 100%; 
         height: auto;
         object-fit: contain;
         pointer-events: none;
-     
     }
+
     .card-front .clarifying-word {
         font-size: 22px;
         font-weight: 600;
         flex-shrink: 0;
     }
-    
-    .card-back {
-        transform: rotateY(180deg);
-        font-size: 19px;
-        font-weight: 400;
-        justify-content: center;
-        background-color: #FFFFFF;
-        color: #000000;
-    }
+
+    /* ---- END OF REPLACEMENT BLOCK ---- */
+        
     
     #word-cloud-modal {
         display: none; position: fixed; z-index: 1000;
@@ -305,6 +342,36 @@
         display: block; margin: 20px auto 0; padding: 10px 25px;
         font-size: 16px; font-family: 'Josefin Sans', sans-serif; cursor: pointer;
     }
+
+    @media (max-width: 600px) {
+    #card-container {
+        /* Pridedame pritraukimą slenkant, kad kortelės sustotų centre */
+        scroll-snap-type: x mandatory;
+        margin-bottom: 20px;
+    }
+
+    .card {
+        /* Kortelė užims 85% ekrano pločio */
+        flex-basis: 85%;
+        height: 450px;
+        min-height: auto;   /* Neleidžia kortelei per daug sumažėti */
+        max-height: none;   /* Neleidžia per daug išaugti siauruose ekranuose */
+        
+        /* Nurodome, kad slenkant kortelė turi pritraukti save prie centro */
+        scroll-snap-align: center;
+    }
+
+    /* Apatinių mygtukų stilius lieka toks pat */
+    .game-controls-bottom {
+        gap: 15px;
+        padding: 8px 15px;
+    }
+    #complete-btn {
+        padding: 8px 20px;
+        font-size: 16px;
+    }
+}
+
 </style>
 </head>
 <body>
@@ -314,7 +381,7 @@
         <img id="game-logo-img" src="images/mind_trails_logo.png" alt= "Mind Trails Logo">
     </div>
     <div class="menu-buttons">
-        <button onclick="showScreen('goal-input-screen')">Start</button>
+        <button onclick="startGame()">Start</button>
         <button onclick="toggleInstructions(true)">Instructions</button>
         <button onclick="toggleControls(true)">Controls</button>
     </div>
@@ -325,25 +392,28 @@
         <h2>What is your challenge or goal?</h2>
         <label for="goal-input" class="goal-prefix">My goal is to...</label><br>
         <input type="text" id="goal-input" placeholder="...overcome my fear of public speaking."><br>
-        <button id="goal-submit-btn" onclick="startGame()">Continue</button>
+        <button id="goal-submit-btn" onclick="submitGoalAndContinue()">Continue</button>
     </div>
 </div>
 
 <div id="game-screen" class="screen">
+
     <div class="game-controls-top">
         <span class="control-icon" onclick="restartGame()">🔄</span>
         <span class="control-icon" onclick="toggleInstructions(true)">ℹ️</span>
+        <span class="control-icon" onclick="toggleControls(true)">⚙️</span> 
     </div>
-    <div id="card-container"></div>
+
+    <div id="card-area-wrapper">
+        <div id="card-container"></div> 
+    </div>
+
     <div class="game-controls-bottom">
-         <button id="back-btn" class="nav-arrow left" onclick="goBack()"></button>
+        <button id="back-btn" class="nav-arrow left" onclick="goBack()"></button>
         <button id="complete-btn">Complete</button>
         <button id="next-btn" class="nav-arrow right" onclick="goNext()"></button>
     </div>
-    <div class="game-controls-top">
-    <span class="control-icon" onclick="restartGame()">🔄</span>
-    <span class="control-icon" onclick="toggleInstructions(true)">ℹ️</span>
-    <span class="control-icon" onclick="toggleControls(true)">⚙️</span> </div>
+
 </div>
 
 <div id="word-cloud-modal"><div id="word-cloud-content"></div></div>
@@ -409,30 +479,56 @@
     }
 
     function startGame() {
-        userGoal = document.getElementById('goal-input').value.trim();
-        if (userGoal === "") {
-            alert("Please enter your goal.");
-            return;
-        }
+        userGoal = ""; // The goal is now empty at the start
+        completedCategories.clear(); // Clear progress from any previous game
+        currentCategoryIndex = 0; // Ensure we start at the first category
+        
         showScreen('game-screen');
         switchCategory(categoryOrder[currentCategoryIndex]);
     }
     
+    function submitGoalAndContinue() {
+        userGoal = document.getElementById('goal-input').value.trim();
+        if (userGoal === "") {
+            alert("Please enter your goal to continue.");
+            return;
+        }
+
+        // Now that we have the goal, show the game screen again
+        showScreen('game-screen');
+
+        // Manually mark the "Goal" category as complete
+        completedCategories.add('Goal');
+
+        resetControls(); 
+
+        // Go to the next category
+        goNext();
+    }
+
     function switchCategory(categoryName) {
         generateCardsForCategory(categoryName);
     }
     
     function generateCardsForCategory(categoryName) {
         const container = document.getElementById('card-container');
-        container.innerHTML = '';
+        // Clear the alignment container completely
+        container.innerHTML = ''; 
+
+        // 1. Create our new scrolling element
+        const scroller = document.createElement('div');
+        scroller.className = 'card-scroller';
+
         const categoryQuestions = questions[categoryName];
         const details = categoryDetails[categoryName];
         
+        // 2. Loop through and add all cards INTO THE SCROLLER
         categoryQuestions.forEach((q, index) => {
             const card = document.createElement('div');
             card.className = 'card';
             card.dataset.index = index;
 
+            // ... (all the code to create the card front and back remains the same)
             const front = document.createElement('div');
             front.className = 'card-face card-front';
             front.style.backgroundColor = details.color;
@@ -451,8 +547,11 @@
 
             card.appendChild(front);
             card.appendChild(back);
-            container.appendChild(card);
             
+            // Append the finished card to our new scroller
+            scroller.appendChild(card); 
+            
+            // ... (all the event listeners for the card remain the same)
             card.addEventListener('mousedown', () => { holdTimer = setTimeout(() => showWordCloud(categoryName), 800); });
             card.addEventListener('touchstart', () => { holdTimer = setTimeout(() => showWordCloud(categoryName), 800); });
             const clearHoldTimer = () => clearTimeout(holdTimer);
@@ -465,6 +564,18 @@
                 card.classList.remove('flipped-by-cloud');
             });
         });
+
+        // 3. Finally, add the fully populated scroller to the container
+        container.appendChild(scroller);
+
+        scroller.addEventListener('wheel', (event) => {
+            // Stop the page from scrolling vertically.
+            event.preventDefault();
+
+            // Convert the vertical wheel movement to horizontal scroll.
+            scroller.scrollLeft += event.deltaY;
+        });
+
         resetControls();
     }
     
@@ -613,21 +724,29 @@
         
 
         completeBtn.addEventListener('click', () => {
+            const currentCategory = categoryOrder[currentCategoryIndex];
 
-            const nextBtn = document.getElementById('next-btn');
+            // IF the current category is "Goal", show the input screen.
+            if (currentCategory === 'Goal') {
+                showScreen('goal-input-screen');
+            } 
+            // OTHERWISE, for all other categories, behave as normal.
+            else {
+                const nextBtn = document.getElementById('next-btn');
 
-            // Change button to "completed" state
-            completeBtn.textContent = 'Completed ✓';
-            completeBtn.classList.add('completed');
-            completeBtn.disabled = true;
-            nextBtn.classList.remove('disabled');
+                // Mark category as complete
+                completeBtn.textContent = 'Completed ✓';
+                completeBtn.classList.add('completed');
+                completeBtn.disabled = true;
+                nextBtn.classList.remove('disabled');
 
-            if (currentCategoryIndex < categoryOrder.length - 1) {
-                const nextCategoryName = categoryOrder[currentCategoryIndex + 1];
-                nextBtn.style.backgroundColor = categoryDetails[nextCategoryName].color;
+                if (currentCategoryIndex < categoryOrder.length - 1) {
+                    const nextCategoryName = categoryOrder[currentCategoryIndex + 1];
+                    nextBtn.style.backgroundColor = categoryDetails[nextCategoryName].color;
+                }
+
+                completedCategories.add(currentCategory);
             }
-
-            completedCategories.add(categoryOrder[currentCategoryIndex]);
         });
     });
 </script>
